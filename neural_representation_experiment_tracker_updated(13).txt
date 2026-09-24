@@ -1,0 +1,683 @@
+NEURAL REPRESENTATION LEARNING EXPERIMENT SERIES
+ML4CPMS Project 1 — Human vs Machine-Generated Text
+======================================================
+
+Purpose
+-------
+Systematically test whether CNNs, RNNs, Transformers, autoencoders,
+contrastive learning, and multi-input neural networks can learn latent
+document vectors that separate the two classes better than our current
+classical pipeline.
+
+CURRENT REFERENCE
+-----------------
+Main64 validation accuracy : 93.0266%
+Main115 validation accuracy: 93.4535%
+Main115 is the current local validation reference.
+
+IMPORTANT
+---------
+- Run experiments one by one.
+- Keep the canonical 80/20 stratified split, random_state=42.
+- Do not submit to Kaggle unless explicitly decided later.
+- For promising experiments, save the learned train/validation embeddings.
+- Evaluate both the neural classifier and simple classifiers on the learned
+  embedding whenever practical.
+- The goal is not only accuracy: determine whether the learned latent vector
+  contains genuinely useful/separable information.
+
+STATUS KEY
+----------
+[ ] Not started
+[~] Running / in progress
+[✓] Completed
+[-] Retired / not worth pursuing further
+
+
+PHASE 1 — SINGLE REPRESENTATION ENCODERS
+========================================
+
+1. [✓] RAW TOKENS → CNN → LATENT VECTOR
+    Input: token ID sequence
+    Encoder: embedding + CNN
+    Output: learned document vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+2. [✓] RAW TOKENS → BiGRU → LATENT VECTOR
+    Input: token ID sequence
+    Encoder: embedding + BiGRU + pooling
+    Output: learned document vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+3. [✓] RAW TOKENS → TRANSFORMER → LATENT VECTOR
+    Input: token ID sequence
+    Encoder: embedding + Transformer + pooling
+    Output: learned document vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+4. [✓] TF-IDF → SVD → MLP ENCODER
+    Input: word/token TF-IDF
+    Compression: SVD
+    Encoder: MLP
+    Output: learned vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+5. [✓] TRANSITION TF-IDF → SVD → MLP ENCODER
+    Input: adjacent-token transition TF-IDF
+    Compression: SVD
+    Encoder: MLP
+    Output: learned vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+6. [✓] STRUCTURAL FEATURES → MLP → LATENT VECTOR
+    Input: compact structural/statistical features
+    Encoder: MLP
+    Output: learned vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+
+PHASE 2 — PAIRWISE REPRESENTATION FUSION
+========================================
+
+7.  [✓] TOKENS + TF-IDF
+     Token encoder + TF-IDF encoder → fusion MLP → z
+
+8.  [ ] TOKENS + STRUCTURAL
+     Token encoder + structural MLP → fusion MLP → z
+
+9.  [ ] TOKENS + TRANSITION TF-IDF
+     Token encoder + transition encoder → fusion MLP → z
+
+10. [ ] TF-IDF + TRANSITION TF-IDF
+     TF-IDF encoder + transition encoder → fusion MLP → z
+
+11. [ ] TF-IDF + STRUCTURAL
+     TF-IDF encoder + structural MLP → fusion MLP → z
+
+12. [ ] TRANSITION TF-IDF + STRUCTURAL
+     Transition encoder + structural MLP → fusion MLP → z
+
+
+PHASE 3 — LARGER MULTI-REPRESENTATION FUSION
+=============================================
+
+13. [ ] TOKENS + TF-IDF + STRUCTURAL
+     Three branches → fusion → z
+
+14. [ ] TOKENS + TF-IDF + TRANSITION TF-IDF
+     Three branches → fusion → z
+
+15. [ ] TOKENS + TRANSITION TF-IDF + STRUCTURAL
+     Three branches → fusion → z
+
+16. [ ] TF-IDF + TRANSITION TF-IDF + STRUCTURAL
+     No raw token input
+     Three branches → fusion → z
+
+17. [ ] EVERYTHING
+     Tokens + TF-IDF + transition TF-IDF + structural features
+     Separate encoders → fusion network → final latent vector z
+
+
+PHASE 4 — MAKE THE LATENT SPACE CLASS-SEPARABLE
+================================================
+
+Apply to the best promising architectures from Phases 1–3.
+
+18. [ ] BEST MODEL + CROSS-ENTROPY
+     Standard supervised classification objective.
+     Baseline for learned latent space.
+
+19. [ ] BEST MODEL + CROSS-ENTROPY + CONTRASTIVE LOSS
+     L = L_CE + lambda * L_contrastive
+     Encourage same-class vectors to be close and different-class
+     vectors to be separated.
+
+20. [ ] BEST MODEL + SUPERVISED CONTRASTIVE LEARNING
+     Train the representation primarily for class separation.
+     Evaluate the learned embedding independently with SVM/LR.
+
+
+PHASE 5 — AUTOENCODER REPRESENTATION LEARNING
+=============================================
+
+21. [ ] TF-IDF AUTOENCODER
+     TF-IDF → encoder → z → decoder → reconstructed TF-IDF
+     Test whether a compact latent representation preserves useful
+     information.
+
+22. [ ] TF-IDF SUPERVISED AUTOENCODER
+     TF-IDF → encoder → z
+                       ├→ decoder → reconstruction
+                       └→ classifier → A/B
+     L = L_reconstruction + lambda * L_CE
+
+23. [ ] TF-IDF + CONTRASTIVE SUPERVISED AUTOENCODER
+     L = L_reconstruction + lambda1 * L_CE
+                       + lambda2 * L_contrastive
+
+
+PHASE 6 — MULTI-INPUT LATENT AUTOENCODERS
+==========================================
+
+24. [ ] TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT VECTOR
+     Multiple encoders → shared z
+     Train with reconstruction + classification objectives.
+     No raw token sequence.
+
+25. [ ] TOKENS + TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT VECTOR
+     Transformer token branch + classical-data branches
+     → shared latent z
+     → classification + reconstruction/contrastive objectives.
+
+
+PHASE 7 — ADD EXISTING CLASSICAL KNOWLEDGE
+===========================================
+
+Only apply these to the strongest learned representations.
+
+26. [ ] LEARNED VECTOR + MAIN64 FEATURES
+     z_learned + Main64 representation → classifier/fusion
+
+27. [ ] LEARNED VECTOR + MAIN115 SPECIALIST OUTPUTS
+     z_learned + Main115 specialist information → classifier/fusion
+
+28. [ ] LEARNED VECTOR + MAIN64 + MAIN115
+     Combine the learned representation with the strongest existing
+     classical information.
+
+
+PHASE 8 — FINAL REPRESENTATION AUDIT
+=====================================
+
+For the strongest learned representations, measure:
+
+29. [ ] EMBEDDING LINEAR SEPARABILITY
+     SVM/LR accuracy and AUC using only z.
+
+30. [ ] EMBEDDING DISTANCE ANALYSIS
+     Within-class distance
+     Between-class distance
+     Between/within distance ratio
+
+31. [ ] EMBEDDING NEAREST-NEIGHBOR ANALYSIS
+     kNN class consistency in learned latent space.
+
+32. [ ] EMBEDDING VISUALIZATION
+     PCA / UMAP / t-SNE where useful.
+     Check whether the two classes form visibly separated regions.
+
+33. [ ] FINAL COMPARISON AGAINST MAIN115
+     Compare the best learned representation and any final fusion
+     against the 93.4535% Main115 validation reference.
+
+
+DECISION RULE
+=============
+After each experiment:
+
+1. Record validation accuracy and AUC.
+2. Record whether SVM/LR on the learned vector performs well.
+3. Check whether the representation adds information beyond existing
+   classical features.
+4. If clearly weak, mark the branch [-] and do not spend excessive time
+   tuning it.
+5. If promising, carry it into the next phase.
+6. Only the strongest representations proceed to the expensive phases.
+
+
+EXPERIMENT LOG
+==============
+
+Experiment | Status | Val Acc | AUC | SVM-on-z | Notes
+-----------|--------|----------|-----|----------|------
+1          | [✓]    | 77.0873% | 0.8414 | 78.0361% | Retired: CNN latent representation weak; SVM-on-z 78.0361%. 3.06M params, z=128, max_len=384. Between/within=1.2787.
+2          | [✓]    | 79.0797% | 0.8835 | 81.0247% | Retired: BiGRU latent representation weak; SVM/LR on z only 81.0247%. 2.62M params, z=128, max_len=384. Between/within=0.6627.
+3          | [✓]    | 79.0323% | 0.8872 | 79.2220% | Retired standalone; LR-on-z 79.5066%. Strongest raw-token neural AUC so far. Embeddings/checkpoint retained for later detailed tuning and complementary fusion.
+4          | [✓]    | 81.4991% | 0.9296 | 78.9848% | Retired standalone; high AUC but weak accuracy. SVD retained 17.43% variance; MLP overfit quickly. Embeddings retained as a potentially complementary representation.
+5          | [✓]    | 77.8463% | 0.8964 | 75.0000% | Retired standalone; transition representation weaker than word/token TF-IDF. LR-on-z 75.6641%, AUC 0.8958. SVD retained 14.52% variance; MLP overfit after epoch 2. Embeddings retained for record/complementarity.
+6          | [✓]    | 80.8824% | 0.8888 | 80.0285% | Retired standalone; structural MLP is weaker than TF-IDF/SVD. LR-on-z 79.9336%, AUC 0.8889. 62-D features, 33,441 params, best epoch 8, between/within=1.2411.
+7          | [✓]    | 82.9696% | 0.9412 | 87.1442% | Retired standalone; strong latent signal but rapid overfitting. Neural best epoch 1. SVM/LR on z: 87.1442%/86.6698%. 13.51M params, z=128, direct 60k TF-IDF, no SVD. Between/within=2.2469. Embeddings retained for later fusion.
+8          | [ ]    |          |     |          |
+9          | [ ]    |          |     |          |
+10         | [ ]    |          |     |          |
+11         | [ ]    |          |     |          |
+12         | [ ]    |          |     |          |
+13         | [ ]    |          |     |          |
+14         | [ ]    |          |     |          |
+15         | [ ]    |          |     |          |
+16         | [ ]    |          |     |          |
+17         | [ ]    |          |     |          |
+18         | [ ]    |          |     |          |
+19         | [ ]    |          |     |          |
+20         | [ ]    |          |     |          |
+21         | [ ]    |          |     |          |
+22         | [ ]    |          |     |          |
+23         | [ ]    |          |     |          |
+24         | [ ]    |          |     |          |
+25         | [ ]    |          |     |          |
+26         | [ ]    |          |     |          |
+27         | [ ]    |          |     |          |
+28         | [ ]    |          |     |          |
+29         | [ ]    |          |     |          |
+30         | [ ]    |          |     |          |
+31         | [ ]    |          |     |          |
+32         | [ ]    |          |     |          |
+33         | [ ]    |          |     |          |
+
+
+EXPERIMENT 1 RESULT — RAW TOKENS → CNN
+======================================
+
+Status: [✓] Completed / [-] Retired
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token embedding: 128-D
+- CNN channels: 128
+- Kernels: 3, 5, 7, 9
+- Learned latent vector: 128-D
+- Trainable parameters: 3,057,537
+
+Results:
+- Neural CNN validation accuracy: 77.0873%
+- Neural CNN validation AUC: 0.8414
+- SVM on learned z: 78.0361%
+- SVM AUC: 0.8450
+- Logistic Regression on learned z: 77.4668%
+- LR AUC: 0.8455
+- Between-class centroid distance: 0.6916
+- Within-class mean distance: 0.5409
+- Between/within ratio: 1.2787
+- Training time: ~0.63 min
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The raw-token CNN learned a weak representation for this task. The learned
+128-D vector is far below the current classical reference, and SVM/LR on the
+vector do not recover the performance. The CNN branch is therefore retired
+without hyperparameter tuning. Its learned embeddings were saved for record
+keeping but are not promoted to later fusion experiments.
+
+EXPERIMENT 2 RESULT — RAW TOKENS → BiGRU
+========================================
+
+Status: [✓] Completed / [-] Retired
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token embedding: 128-D
+- BiGRU hidden: 128-D per direction
+- Learned latent vector: 128-D
+- Layers: 1
+- Dropout: 0.2
+- Batch size: 64
+- Trainable parameters: 2,624,385
+- Best epoch: 2
+
+Results:
+- Neural BiGRU validation accuracy: 79.0797%
+- Neural BiGRU validation AUC: 0.8835
+- SVM on learned z: 81.0247%
+- SVM AUC: 0.8817
+- Logistic Regression on learned z: 81.0247%
+- LR AUC: 0.8819
+- Between-class centroid distance: 4.9383
+- Within-class mean distance: 7.4518
+- Between/within ratio: 0.6627
+- Training + evaluation time: ~1.17 min
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The raw-token BiGRU learned a weak latent representation for this task.
+Although its AUC (0.8835 neural, ~0.8818 with SVM/LR) shows that the
+representation contains some class-related information, its validation
+accuracy is far below the Main64/Main115 references. SVM and LR on the
+learned vector improve over the neural classifier but reach only 81.0247%.
+The between/within ratio of 0.6627 also indicates poor class separation
+under this distance measure. Therefore the BiGRU branch is retired
+without hyperparameter tuning and is not promoted to later fusion phases.
+The learned embeddings and checkpoint are retained for record keeping.
+
+EXPERIMENT 3 RESULT — RAW TOKENS → TRANSFORMER
+==============================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token embedding: 128-D
+- Transformer heads: 4
+- Transformer layers: 2
+- Feed-forward dimension: 256
+- Dropout: 0.2
+- Learned latent vector: 128-D
+- Batch size: 32
+- Trainable parameters: 2,674,689
+- Best epoch: 6
+
+Results:
+- Neural Transformer validation accuracy: 79.0323%
+- Neural Transformer validation AUC: 0.8872
+- SVM on learned z: 79.2220%
+- SVM AUC: 0.8845
+- Logistic Regression on learned z: 79.5066%
+- LR AUC: 0.8846
+- Between-class centroid distance: 7.9813
+- Within-class mean distance: 8.3735
+- Between/within ratio: 0.9532
+- Training + evaluation time: ~8.64 min
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The raw-token Transformer learned a weak standalone representation for
+this task. Its AUC of 0.8872 is the strongest AUC among the three Phase 1
+raw-token encoders tested so far, so it contains some class-related signal,
+but its accuracy remains far below the Main64/Main115 references. SVM and
+LR on the learned vector do not recover the lost performance, reaching only
+79.2220% and 79.5066% respectively. The between/within ratio of 0.9532 also
+does not indicate strong class separation. The Transformer branch is
+therefore retired without hyperparameter tuning.
+
+Important future note:
+Do not permanently discard this branch. Its embeddings and checkpoint are
+retained for a later detailed Transformer study and for complementary
+fusion. Later we can test stronger architecture/training choices, longer
+context, alternative pooling, and especially strict OOF fusion with the
+strong classical models. This revisit should happen after the broader
+representation sweep so that we do not repeatedly tune against the same
+validation set.
+
+
+EXPERIMENT 4 RESULT — TF-IDF → SVD → MLP ENCODER
+================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Input: word/token TF-IDF
+- TF-IDF n-grams: 1–3
+- TF-IDF min_df: 2
+- TF-IDF max_df: 0.995
+- TF-IDF max_features: 60,000
+- Sublinear TF: enabled
+- SVD components: 256
+- SVD explained variance ratio: 0.1743
+- MLP hidden layers: 256 → 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 140,865
+- Best epoch: 2
+- Runtime: ~0.25 min
+
+Results:
+- Neural MLP validation accuracy: 81.4991%
+- Neural MLP validation AUC: 0.9296
+- SVM on learned z: 78.9848%
+- SVM AUC: 0.9282
+- Logistic Regression on learned z: 78.9848%
+- LR AUC: 0.9283
+- Between-class centroid distance: 11.0618
+- Within-class mean distance: 5.8832
+- Between/within ratio: 1.8802
+
+Training behavior:
+- Train accuracy reached 94.0081% at the selected checkpoint.
+- Validation loss was best at epoch 2 and then increased sharply.
+- By epoch 8, train loss had fallen to 0.0691 while validation loss had risen
+  to 0.8776, showing strong overfitting.
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The TF-IDF → SVD → MLP representation is weak as a standalone classifier:
+81.4991% validation accuracy is far below the Main64/Main115 references, and
+SVM/LR on the learned 128-D vector perform even worse at 78.9848%.
+
+However, this branch is more interesting than its accuracy alone suggests.
+Its validation AUC of 0.9296 is substantially stronger than the three
+raw-token Phase 1 neural encoders tested so far, indicating that the latent
+representation preserves useful class-ranking information even though the
+classification boundary is poor. The between/within ratio of 1.8802 is also
+higher than the raw-token experiments.
+
+The main failure is therefore not absence of signal but poor standalone
+classification/generalization of the learned latent space. The very early
+best epoch and widening train/validation loss gap indicate overfitting.
+The branch is retired without immediate hyperparameter tuning, but its
+embeddings are retained for possible complementary fusion with the strong
+classical pipeline in a later phase.
+
+
+
+EXPERIMENT 5 RESULT — TRANSITION TF-IDF → SVD → MLP ENCODER
+============================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Input: adjacent-token transitions
+- Transition format: token_i>token_i+1
+- TF-IDF n-grams: 1–2 over transition tokens
+- TF-IDF min_df: 2
+- TF-IDF max_df: 0.995
+- TF-IDF max_features: 60,000
+- Sublinear TF: enabled
+- SVD components: 256
+- SVD explained variance ratio: 0.1452
+- MLP hidden layers: 256 → 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 140,865
+- Best epoch: 2
+- Runtime: ~0.22 min
+
+Results:
+- Neural MLP validation accuracy: 77.8463%
+- Neural MLP validation AUC: 0.8964
+- SVM on learned z: 75.0000%
+- SVM AUC: 0.8921
+- Logistic Regression on learned z: 75.6641%
+- LR AUC: 0.8958
+- Between-class centroid distance: 6.1236
+- Within-class mean distance: 3.7108
+- Between/within ratio: 1.6502
+
+Training behavior:
+- Validation loss was best at epoch 2.
+- Train loss continued falling after epoch 2 while validation loss increased.
+- By epoch 8, train loss was 0.1267 while validation loss had risen to 0.7288,
+  indicating clear overfitting.
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The transition TF-IDF → SVD → MLP representation is weak as a standalone
+classifier. Validation accuracy of 77.8463% is substantially below the
+Main64/Main115 references, and SVM/LR on the learned vector perform even
+worse.
+
+The representation does contain class-related information, as shown by
+AUC 0.8964 and a between/within ratio of 1.6502, but it is clearly weaker
+than the word/token TF-IDF representation from Experiment 4. Its SVD also
+captures less variance (14.52% versus 17.43% for Experiment 4).
+
+Therefore this branch is retired without hyperparameter tuning. The
+embeddings/checkpoint are retained for record keeping and possible later
+complementary fusion, but this representation is not promoted as a primary
+candidate.
+
+
+
+EXPERIMENT 6 RESULT — STRUCTURAL FEATURES → MLP → LATENT VECTOR
+===============================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Input: 62 compact structural/statistical features
+- Feature groups: length, token diversity, entropy, frequency concentration,
+  transition statistics, positional statistics, chunk statistics, and local
+  variability
+- Standardization: fitted on TRAIN ONLY
+- MLP hidden layers: 128 → 96
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 33,441
+- Best epoch: 8
+- Runtime: ~0.21 min
+
+Results:
+- Neural MLP validation accuracy: 80.8824%
+- Neural MLP validation AUC: 0.8888
+- SVM on learned z: 80.0285%
+- SVM AUC: 0.8868
+- Logistic Regression on learned z: 79.9336%
+- LR AUC: 0.8889
+- Between-class centroid distance: 5.8550
+- Within-class mean distance: 4.7177
+- Between/within ratio: 1.2411
+
+Training behavior:
+- Validation loss reached its best value at epoch 8.
+- The model did not show the severe early overfitting seen in the
+  TF-IDF/SVD and transition-TF-IDF/SVD experiments.
+- After epoch 8, validation loss generally remained above the best value,
+  while training loss continued to decline.
+- Early stopping occurred at epoch 15.
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Comparison with previous Phase 1 experiments:
+- Better standalone accuracy than the transition TF-IDF branch (77.8463%).
+- Similar standalone accuracy to the word/token TF-IDF → SVD → MLP branch
+  only in the broad sense that both remain far below the classical reference;
+  Main125/Experiment 4 is clearly stronger at 81.4991% and AUC 0.9296.
+- Structural AUC (0.8888) is weaker than Experiment 4 (0.9296) and
+  Experiment 5 (0.8964).
+- The learned structural representation also has a lower between/within
+  ratio (1.2411) than Experiment 4 (1.8802) and Experiment 5 (1.6502).
+
+Conclusion:
+The structural-feature MLP learns some class-related information, but its
+standalone performance is well below the Main64/Main115 references.
+SVM/LR on the learned vector do not materially improve the representation,
+and the latent geometry is weaker than the strongest Phase 1 branches.
+
+Therefore the structural branch is retired as a standalone candidate
+without hyperparameter tuning. Its embeddings are retained because
+structural information may still be complementary to lexical and learned
+representations in later fusion experiments.
+
+
+
+EXP 7 RESULT — TOKENS + TF-IDF
+==============================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token encoder: embedding 96-D + BiGRU hidden 96-D/direction
+- Token branch output: 128-D
+- Direct word TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- TF-IDF branch output: 96-D
+- Fusion MLP hidden: 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 64
+- Trainable parameters: 13,514,465
+- Best epoch: 1
+- Runtime: ~0.68 min
+- SVD: NONE
+
+Results:
+- Neural validation accuracy: 82.9696%
+- Neural validation AUC: 0.9412
+- SVM on learned z: 87.1442%
+- SVM AUC: 0.9380
+- Logistic Regression on learned z: 86.6698%
+- LR AUC: 0.9385
+- Between-class centroid distance: 12.3781
+- Within-class mean radius: 5.5089
+- Between/within ratio: 2.2469
+
+Training behavior:
+- Epoch 1: train acc 80.90%, val acc 82.97%, val AUC 0.9412.
+- Epoch 2: train acc 97.31%, while val loss increased from 0.2283 to 0.2927.
+- Epoch 3: train acc 99.03%, val acc peaked at 87.00%, but val loss
+  continued increasing and AUC fell to 0.9383.
+- Later epochs continued to overfit; early stopping occurred at epoch 7.
+- The selected checkpoint is epoch 1 because model selection uses validation loss.
+
+Interpretation:
+- The latent representation contains substantial class-related information.
+- SVM-on-z substantially outperforms the neural classifier, reaching 87.14%.
+- AUC 0.9412 and between/within ratio 2.2469 make this one of the
+  more interesting learned representations in the sweep.
+- Nevertheless, standalone accuracy remains below Main64/Main115.
+- The 13.5M parameter model overfits extremely quickly, so immediate
+  hyperparameter tuning is not justified.
+
+Decision:
+- Retire as a standalone classifier.
+- Retain main127_embeddings.npz and main127_best.pt.
+- Use the learned representation as a possible complementary branch
+  in later fusion experiments.
+
+CURRENT BEST LOCAL VALIDATION REFERENCE
+=======================================
+Main115
+Validation accuracy: 93.4535%
+
+Current best submittable Kaggle model:
+Main79 — 95.00% public Kaggle score
+
+Next experiment to run:
+Experiment 8 — TOKENS + STRUCTURAL
