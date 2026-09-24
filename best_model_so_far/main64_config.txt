@@ -1,0 +1,9 @@
+Main64 corrected OOF stacking
+accuracy=0.92077799
+oof_accuracy=0.91955387
+folds=5
+word_ngram=(1, 6)
+word_min_df=3
+transition_ngram=(1, 2)
+transition_min_df=2
+meta_C=0.1
