@@ -1,0 +1,18 @@
+{
+  "experiment": "Exp10",
+  "title": "TF-IDF + Transition TF-IDF",
+  "val_accuracy_0.5": 0.8790322580645161,
+  "val_accuracy_best_threshold": 0.8870967741935484,
+  "best_threshold": 0.14500000000000005,
+  "val_auc_neural": 0.9430945748379957,
+  "svm_accuracy": 0.8610056925996205,
+  "svm_auc": 0.9277767899478426,
+  "lr_accuracy": 0.860056925996205,
+  "lr_auc": 0.9423522206416943,
+  "between": 12.935837745666504,
+  "within": 5.406850814819336,
+  "between_within_ratio": 2.3924901485443115,
+  "best_epoch": 7,
+  "params": 2398593,
+  "time_min": 1.7177703499794006
+}

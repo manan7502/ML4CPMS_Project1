@@ -1,0 +1,18 @@
+{
+  "experiment": "Exp9",
+  "title": "Tokens + Transition TF-IDF",
+  "val_accuracy_0.5": 0.7794117647058824,
+  "val_accuracy_best_threshold": 0.8140417457305503,
+  "best_threshold": 0.6000000000000004,
+  "val_auc_neural": 0.9207286233602023,
+  "svm_accuracy": 0.8325426944971537,
+  "svm_auc": 0.9009927690848742,
+  "lr_accuracy": 0.8391840607210627,
+  "lr_auc": 0.9170114193140508,
+  "between": 9.218462944030762,
+  "within": 4.830624103546143,
+  "between_within_ratio": 1.9083378314971924,
+  "best_epoch": 3,
+  "params": 2266369,
+  "time_min": 0.5547430713971456
+}

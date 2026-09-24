@@ -1,0 +1,18 @@
+{
+  "experiment": "Exp11",
+  "title": "TF-IDF + Structural",
+  "val_accuracy_0.5": 0.8870967741935484,
+  "val_accuracy_best_threshold": 0.894212523719165,
+  "best_threshold": 0.5550000000000004,
+  "val_auc_neural": 0.9612592856013907,
+  "svm_accuracy": 0.8908918406072106,
+  "svm_auc": 0.950104709973131,
+  "lr_accuracy": 0.889943074003795,
+  "lr_auc": 0.9586365971234392,
+  "between": 11.750198364257812,
+  "within": 4.2491888999938965,
+  "between_within_ratio": 2.765280246734619,
+  "best_epoch": 4,
+  "params": 2347905,
+  "time_min": 1.3696696360905964
+}

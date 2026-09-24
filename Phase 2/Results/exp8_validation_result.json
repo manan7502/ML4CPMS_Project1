@@ -1,0 +1,18 @@
+{
+  "experiment": "Exp8",
+  "title": "Tokens + Structural",
+  "val_accuracy_0.5": 0.8752371916508539,
+  "val_accuracy_best_threshold": 0.8761859582542695,
+  "best_threshold": 0.5200000000000004,
+  "val_auc_neural": 0.9436492413466098,
+  "svm_accuracy": 0.8776091081593927,
+  "svm_auc": 0.942952821242295,
+  "lr_accuracy": 0.877134724857685,
+  "lr_auc": 0.9401266397976925,
+  "between": 12.674522399902344,
+  "within": 5.311553001403809,
+  "between_within_ratio": 2.3862178325653076,
+  "best_epoch": 6,
+  "params": 2215681,
+  "time_min": 0.6487270355224609
+}

@@ -1,0 +1,18 @@
+{
+  "experiment": "Exp12",
+  "title": "Transition TF-IDF + Structural",
+  "val_accuracy_0.5": 0.8833017077798861,
+  "val_accuracy_best_threshold": 0.8904174573055028,
+  "best_threshold": 0.5800000000000004,
+  "val_auc_neural": 0.9535305041883988,
+  "svm_accuracy": 0.8894686907020873,
+  "svm_auc": 0.9439307728781411,
+  "lr_accuracy": 0.8870967741935484,
+  "lr_auc": 0.9507754464991307,
+  "between": 10.90104866027832,
+  "within": 4.47215461730957,
+  "between_within_ratio": 2.4375383853912354,
+  "best_epoch": 3,
+  "params": 2347905,
+  "time_min": 0.736533252398173
+}

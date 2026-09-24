@@ -1,0 +1,18 @@
+{
+  "experiment": "Exp7 Tokens + TF-IDF",
+  "validation_neural_accuracy": 0.8277988614800759,
+  "validation_neural_auc": 0.9151799826141931,
+  "validation_svm_accuracy": 0.8268500948766604,
+  "validation_svm_auc": 0.9202307570728623,
+  "validation_lr_accuracy": 0.8263757115749526,
+  "validation_lr_auc": 0.9211701833412359,
+  "validation_best_threshold": 0.315,
+  "validation_accuracy_at_best_threshold": 0.8372865275142315,
+  "full_train_documents": 10536,
+  "test_documents": 3000,
+  "final_epochs": 2,
+  "final_training_minutes": 0.09496753215789795,
+  "final_num_parameters": 2854913,
+  "predicted_A": 1079,
+  "predicted_B": 1921
+}
