@@ -1,0 +1,28 @@
+MAIN79 + EXP11 BLEND
+
+Main79 validation:
+Accuracy = 0.9364326376
+AUC      = 0.9803698435
+
+Exp11 validation:
+Accuracy = 0.8671726755
+AUC      = 0.9620742453
+
+Blend:
+Alpha = 0.86
+Accuracy = 0.9388045541
+AUC      = 0.9826665481
+
+Kaggle:
+Main79 = 0.9500
+Main79 + Exp11 blend = 0.9506
+
+Test prediction counts:
+Main79: A=1048, B=1952
+Exp11:  A=1326, B=1674
+Blend:  A=1074, B=1926
+
+Conclusion:
+Exp11 provides complementary information to Main79.
+The blend improved the Kaggle public score by 0.0006.
+Do not continue tuning Exp11 unless needed for a later ensemble.
