@@ -1,0 +1,23 @@
+{
+  "stage": 4,
+  "stage_name": "Stage 4: Sequential Dynamics & Token Burstiness",
+  "features_added": [
+    "Half-Doc Jaccard Overlap",
+    "Token Recurrence Burstiness"
+  ],
+  "baseline_mean_acc": 89.22741039401508,
+  "stage1_mean_acc": 89.69247263796741,
+  "stage2_mean_acc": 90.30942759699528,
+  "stage3_mean_acc": 91.25856794330635,
+  "stage4_mean_acc": 91.30603329103585,
+  "stage4_std_acc": 0.3990060604065778,
+  "delta_vs_baseline": 2.0786228970207645,
+  "delta_vs_previous_stage": 0.047465347729499285,
+  "fold_accuracies": [
+    90.9392789373814,
+    91.55196962505933,
+    90.79259610821072,
+    91.88419553868059,
+    91.36212624584718
+  ]
+}

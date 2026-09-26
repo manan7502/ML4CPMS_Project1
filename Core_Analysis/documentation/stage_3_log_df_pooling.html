@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stage 3: Log-DF Likelihood Pooling | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html" class="active">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4 (91.31%)</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html" class="active"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Stage_3_Log_DF_Likelihood_Pooling.ipynb"><span>Notebook: Stage 3</span></a></li>
+        <li><a href="../data/stage_3_evaluation_metrics.json"><span>Metrics: Stage 3 JSON</span></a></li>
+        <li><a href="../data/unigram_log_df_ratios.json"><span>Data: Precomputed Log-DF Ratios</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Stage 3: Log-DF Pooling</span>
+      </div>
+
+      <h1>Stage 3: Augmenting with Document-Level Log-DF Likelihood Ratio Pooling</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        Harnessing global Bayesian corpus log-odds likelihood ratios through continuous sequence moment pooling, achieving the largest single-stage performance jump (+0.95%).
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">Stage 3 Milestone: The +0.95% Breakthrough</div>
+          <span class="badge badge-green">Accuracy: 91.26% (Δ = +2.03% vs. Base)</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          By pooling unigram document frequency log-odds into continuous document summary statistics, Stage 3 drove cross-validation accuracy to 91.26% (with individual folds reaching 92.31%), solving the high-order sparsity failure of Naive Bayes SVMs.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Stage 3 Accuracy</div>
+          <div class="metric-value" style="color: #16a34a;">91.26%</div>
+          <div class="metric-sub">±0.55% (5-Fold Stratified CV)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Single-Stage Jump</div>
+          <div class="metric-value" style="color: #7e22ce;">+0.95%</div>
+          <div class="metric-sub">Largest gain over Stage 2 (90.31%)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Cumulative Gain</div>
+          <div class="metric-value" style="color: #2563eb;">+2.03%</div>
+          <div class="metric-sub">Over Baseline (89.23%)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Peak Single Fold</div>
+          <div class="metric-value" style="color: #0f766e;">92.31%</div>
+          <div class="metric-sub">Achieved on Fold 4</div>
+        </div>
+      </div>
+
+      <h2>1. Theoretical Foundation of Log Document Frequency Ratios</h2>
+      <p>
+        Generative language models possess systemic corpus-level vocabulary biases: certain token families are disproportionately over-represented, while human colloquialisms and idiosyncratic phrasings are under-represented.
+      </p>
+      <p>
+        For each token \(t\) in the 12,582-token unigram vocabulary, its empirical log-odds likelihood ratio between Machine (Class B) and Human (Class A) documents is defined under Laplace smoothing as:
+      </p>
+
+      <div class="formula-box">
+        $$r_t = \ln \left(\frac{\text{DF}_B(t) + 1}{|D_B| + 2}\right) - \ln \left(\frac{\text{DF}_A(t) + 1}{|D_A| + 2}\right)$$
+      </div>
+
+      <p>
+        where \(|D_B| = 6,837\) and \(|D_A| = 3,699\).
+      </p>
+      <ul>
+        <li>When \(r_t > 0\), token \(t\) has a higher empirical probability of appearing in a machine-generated text.</li>
+        <li>When \(r_t < 0\), token \(t\) is strongly indicative of human authorship.</li>
+      </ul>
+
+      <h2>2. The Failed Experiment: Why Pointwise NBSVM Failed</h2>
+      <p>
+        In classical text classification literature (Wang & Manning, ACL 2012), <strong>Naive Bayes SVM (NBSVM)</strong> achieves strong results by multiplying the sparse feature vector element-wise by the log-count ratio vector:
+      </p>
+      <div class="formula-box">
+        $$\tilde{\mathbf{x}} = \mathbf{r} \odot \mathbf{x}$$
+      </div>
+
+      <div class="callout callout-danger">
+        <div class="callout-title">NBSVM Empirical Result: Accuracy Dropped to 89.18%</div>
+        When we implemented pointwise NBSVM weighting across our cumulative 1-5 gram feature space (\(P = 248,349\)), accuracy plummeted from <strong>90.31%</strong> to <strong>89.18% (-1.13%)</strong>.
+      </div>
+
+      <h3>Why did pointwise NBSVM fail on high-order N-grams?</h3>
+      <ol>
+        <li><strong>Laplace Distortion on Rare N-Grams</strong>: In higher-order \(N\)-grams (4-grams and 5-grams), tens of thousands of features appear only 1 or 2 times across the entire dataset. For these rare features, the Laplace pseudo-count \(+1\) dominates the true frequency, injecting massive estimation noise into the coordinates.</li>
+        <li><strong>Margin Distortion</strong>: Pointwise multiplication magnifies the magnitude of rare, noisy features, severely degrading the margin geometry of the Linear SVM hyperplane.</li>
+      </ol>
+
+      <h2>3. The Resolution: Document-Level Moment Pooling</h2>
+      <p>
+        Instead of modifying individual sparse coordinates, we mapped the token sequence of each essay \(d = (t_1, t_2, \dots, t_n)\) to its corresponding unigram log-odds sequence \(\{r_{t_i}\}\) and extracted five continuous summary moments:
+      </p>
+
+      <div class="formula-box">
+        $$\mu_{\text{aff}} = \frac{1}{|d|} \sum_{t \in d} r_t, \quad \sigma_{\text{aff}} = \sqrt{\frac{1}{|d|} \sum_{t \in d} (r_t - \mu_{\text{aff}})^2}$$
+        $$\max_{\text{aff}} = \max_{t \in d} r_t, \quad \min_{\text{aff}} = \min_{t \in d} r_t, \quad \text{Pos\_Ratio} = \frac{|\{t \in d : r_t > 0\}|}{|d|}$$
+      </div>
+
+      <p>
+        <strong>Why Pooling Works</strong>: Document-level pooling smooths out token-level variance via the Central Limit Theorem. The resulting summary statistics represent the <em>aggregate machine affinity distribution</em> of the entire essay as a compact, continuous descriptor.
+      </p>
+
+      <h2>4. Empirical Class Separation</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Machine Mean (Class B)</th>
+              <th>Human Mean (Class A)</th>
+              <th>Absolute Difference</th>
+              <th>Separation Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="stage-highlight">
+              <td><strong>Mean Machine Affinity (\(\mu_{\text{aff}}\))</strong></td>
+              <td><strong>+0.584</strong></td>
+              <td>+0.468</td>
+              <td><strong>+0.116</strong></td>
+              <td><strong>1.25× Separation</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Std Machine Affinity (\(\sigma_{\text{aff}}\))</strong></td>
+              <td>0.742</td>
+              <td>0.768</td>
+              <td>0.026</td>
+              <td>Human vocabulary has wider spread</td>
+            </tr>
+            <tr>
+              <td><strong>Max Machine Affinity (\(\max_{\text{aff}}\))</strong></td>
+              <td><strong>+2.841</strong></td>
+              <td>+2.612</td>
+              <td>+0.229</td>
+              <td>Machine contains hyper-affinity tokens</td>
+            </tr>
+            <tr>
+              <td><strong>Min Machine Affinity (\(\min_{\text{aff}}\))</strong></td>
+              <td>-1.892</td>
+              <td><strong>-2.215</strong></td>
+              <td>0.323</td>
+              <td>Human contains deeper negative-odds words</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Positive Affinity Token Ratio</strong></td>
+              <td><strong>78.9%</strong></td>
+              <td>73.1%</td>
+              <td><strong>+5.8%</strong></td>
+              <td>Significantly higher machine concentration</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>5. 5-Fold Cross-Validation Progression</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Fold</th>
+              <th>Baseline</th>
+              <th>Stage 1</th>
+              <th>Stage 2</th>
+              <th>Stage 3</th>
+              <th>Stage 3 vs. Stage 2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fold 1</td>
+              <td>89.33%</td>
+              <td>89.80%</td>
+              <td>90.18%</td>
+              <td>90.99%</td>
+              <td>+0.81%</td>
+            </tr>
+            <tr>
+              <td>Fold 2</td>
+              <td>88.19%</td>
+              <td>88.80%</td>
+              <td>89.56%</td>
+              <td>91.22%</td>
+              <td>+1.66%</td>
+            </tr>
+            <tr>
+              <td>Fold 3</td>
+              <td>89.80%</td>
+              <td>90.08%</td>
+              <td>90.89%</td>
+              <td>90.70%</td>
+              <td>-0.19%</td>
+            </tr>
+            <tr>
+              <td>Fold 4</td>
+              <td>89.28%</td>
+              <td>89.75%</td>
+              <td>90.51%</td>
+              <td><strong>92.31%</strong></td>
+              <td>+1.80%</td>
+            </tr>
+            <tr>
+              <td>Fold 5</td>
+              <td>89.55%</td>
+              <td>90.03%</td>
+              <td>90.41%</td>
+              <td>91.08%</td>
+              <td>+0.67%</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Mean ± Std</strong></td>
+              <td><strong>89.23% ± 0.75%</strong></td>
+              <td><strong>89.69% ± 0.46%</strong></td>
+              <td><strong>90.31% ± 0.44%</strong></td>
+              <td><strong>91.26% ± 0.55%</strong></td>
+              <td><strong>+0.95% Gain</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="stage_2_ngram_repetition.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous Stage</span>
+          <span class="nav-btn-title">&larr; Stage 2: Repetition & Profiling</span>
+        </a>
+        <a href="stage_4_burstiness_dynamics.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Stage</span>
+          <span class="nav-btn-title">Stage 4: Burstiness Dynamics &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

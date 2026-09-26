@@ -1,0 +1,662 @@
+{
+  "1-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "8673",
+        "DF Machine": 94,
+        "DF Human": 0,
+        "Log DF Ratio": 4.553876891600541
+      },
+      {
+        "N-Gram String": "4353",
+        "DF Machine": 79,
+        "DF Human": 0,
+        "Log DF Ratio": 4.382026634673881
+      },
+      {
+        "N-Gram String": "8450",
+        "DF Machine": 78,
+        "DF Human": 0,
+        "Log DF Ratio": 4.3694478524670215
+      },
+      {
+        "N-Gram String": "3641",
+        "DF Machine": 70,
+        "DF Human": 0,
+        "Log DF Ratio": 4.2626798770413155
+      },
+      {
+        "N-Gram String": "13502",
+        "DF Machine": 70,
+        "DF Human": 0,
+        "Log DF Ratio": 4.2626798770413155
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "7416",
+        "DF Machine": 0,
+        "DF Human": 58,
+        "Log DF Ratio": -4.07753744390572
+      },
+      {
+        "N-Gram String": "6465",
+        "DF Machine": 0,
+        "DF Human": 14,
+        "Log DF Ratio": -2.70805020110221
+      },
+      {
+        "N-Gram String": "9612",
+        "DF Machine": 0,
+        "DF Human": 11,
+        "Log DF Ratio": -2.4849066497880004
+      },
+      {
+        "N-Gram String": "4456",
+        "DF Machine": 0,
+        "DF Human": 10,
+        "Log DF Ratio": -2.3978952727983707
+      },
+      {
+        "N-Gram String": "9227",
+        "DF Machine": 0,
+        "DF Human": 10,
+        "Log DF Ratio": -2.3978952727983707
+      }
+    ]
+  },
+  "2-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "15611 3537",
+        "DF Machine": 89,
+        "DF Human": 0,
+        "Log DF Ratio": 4.499809670330265
+      },
+      {
+        "N-Gram String": "3682 1932",
+        "DF Machine": 80,
+        "DF Human": 0,
+        "Log DF Ratio": 4.394449154672439
+      },
+      {
+        "N-Gram String": "9184 8294",
+        "DF Machine": 62,
+        "DF Human": 0,
+        "Log DF Ratio": 4.143134726391533
+      },
+      {
+        "N-Gram String": "7609 16257",
+        "DF Machine": 61,
+        "DF Human": 0,
+        "Log DF Ratio": 4.127134385045092
+      },
+      {
+        "N-Gram String": "8294 7609",
+        "DF Machine": 59,
+        "DF Human": 0,
+        "Log DF Ratio": 4.0943445622221
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "14199 4067",
+        "DF Machine": 0,
+        "DF Human": 35,
+        "Log DF Ratio": -3.58351893845611
+      },
+      {
+        "N-Gram String": "11398 8770",
+        "DF Machine": 0,
+        "DF Human": 19,
+        "Log DF Ratio": -2.995732273553991
+      },
+      {
+        "N-Gram String": "2269 7416",
+        "DF Machine": 0,
+        "DF Human": 19,
+        "Log DF Ratio": -2.995732273553991
+      },
+      {
+        "N-Gram String": "17598 1862",
+        "DF Machine": 0,
+        "DF Human": 15,
+        "Log DF Ratio": -2.772588722239781
+      },
+      {
+        "N-Gram String": "10977 3484",
+        "DF Machine": 0,
+        "DF Human": 15,
+        "Log DF Ratio": -2.772588722239781
+      }
+    ]
+  },
+  "3-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "6148 14679 7739",
+        "DF Machine": 59,
+        "DF Human": 0,
+        "Log DF Ratio": 4.0943445622221
+      },
+      {
+        "N-Gram String": "6148 14679 10364",
+        "DF Machine": 55,
+        "DF Human": 0,
+        "Log DF Ratio": 4.02535169073515
+      },
+      {
+        "N-Gram String": "8294 6148 14679",
+        "DF Machine": 50,
+        "DF Human": 0,
+        "Log DF Ratio": 3.9318256327243257
+      },
+      {
+        "N-Gram String": "2129 8058 4335",
+        "DF Machine": 47,
+        "DF Human": 0,
+        "Log DF Ratio": 3.871201010907891
+      },
+      {
+        "N-Gram String": "8294 7739 12506",
+        "DF Machine": 47,
+        "DF Human": 0,
+        "Log DF Ratio": 3.871201010907891
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "9932 14245 15237",
+        "DF Machine": 0,
+        "DF Human": 12,
+        "Log DF Ratio": -2.5649493574615367
+      },
+      {
+        "N-Gram String": "14893 17154 8294",
+        "DF Machine": 0,
+        "DF Human": 12,
+        "Log DF Ratio": -2.5649493574615367
+      },
+      {
+        "N-Gram String": "14245 6285 559",
+        "DF Machine": 0,
+        "DF Human": 11,
+        "Log DF Ratio": -2.4849066497880004
+      },
+      {
+        "N-Gram String": "12960 15498 8294",
+        "DF Machine": 0,
+        "DF Human": 10,
+        "Log DF Ratio": -2.3978952727983707
+      },
+      {
+        "N-Gram String": "8294 12918 3300",
+        "DF Machine": 0,
+        "DF Human": 10,
+        "Log DF Ratio": -2.3978952727983707
+      }
+    ]
+  },
+  "4-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "559 6148 14679 7739",
+        "DF Machine": 48,
+        "DF Human": 0,
+        "Log DF Ratio": 3.8918202981106265
+      },
+      {
+        "N-Gram String": "559 6148 14679 10364",
+        "DF Machine": 47,
+        "DF Human": 0,
+        "Log DF Ratio": 3.871201010907891
+      },
+      {
+        "N-Gram String": "9899 2129 8058 4335",
+        "DF Machine": 42,
+        "DF Human": 0,
+        "Log DF Ratio": 3.7612001156935624
+      },
+      {
+        "N-Gram String": "15131 9899 2129 8058",
+        "DF Machine": 39,
+        "DF Human": 0,
+        "Log DF Ratio": 3.6888794541139363
+      },
+      {
+        "N-Gram String": "14893 8673 1832 12204",
+        "DF Machine": 37,
+        "DF Human": 0,
+        "Log DF Ratio": 3.6375861597263857
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "9899 14893 17154 8294",
+        "DF Machine": 0,
+        "DF Human": 8,
+        "Log DF Ratio": -2.1972245773362196
+      },
+      {
+        "N-Gram String": "6764 5644 3484 10977",
+        "DF Machine": 0,
+        "DF Human": 8,
+        "Log DF Ratio": -2.1972245773362196
+      },
+      {
+        "N-Gram String": "8294 17175 18302 3755",
+        "DF Machine": 0,
+        "DF Human": 8,
+        "Log DF Ratio": -2.1972245773362196
+      },
+      {
+        "N-Gram String": "7739 15348 17175 3554",
+        "DF Machine": 0,
+        "DF Human": 7,
+        "Log DF Ratio": -2.0794415416798357
+      },
+      {
+        "N-Gram String": "12516 18248 14245 9141",
+        "DF Machine": 0,
+        "DF Human": 7,
+        "Log DF Ratio": -2.0794415416798357
+      }
+    ]
+  },
+  "5-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "0 14069 13244 8294 14679",
+        "DF Machine": 49,
+        "DF Human": 0,
+        "Log DF Ratio": 3.912023005428146
+      },
+      {
+        "N-Gram String": "8294 559 6148 14679 10364",
+        "DF Machine": 39,
+        "DF Human": 0,
+        "Log DF Ratio": 3.6888794541139363
+      },
+      {
+        "N-Gram String": "8294 559 6148 14679 7739",
+        "DF Machine": 38,
+        "DF Human": 0,
+        "Log DF Ratio": 3.6635616461296463
+      },
+      {
+        "N-Gram String": "14679 8294 8294 8294 14679",
+        "DF Machine": 77,
+        "DF Human": 1,
+        "Log DF Ratio": 3.6635616461296463
+      },
+      {
+        "N-Gram String": "15131 9899 2129 8058 4335",
+        "DF Machine": 37,
+        "DF Human": 0,
+        "Log DF Ratio": 3.6375861597263857
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "12981 7014 13141 9932 15132",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      },
+      {
+        "N-Gram String": "8294 17083 2191 17083 17083",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      },
+      {
+        "N-Gram String": "8294 10364 14508 2757 14212",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      },
+      {
+        "N-Gram String": "17154 7739 15063 3484 7739",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      },
+      {
+        "N-Gram String": "8294 8294 8294 8294 18121",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      }
+    ]
+  },
+  "6-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "15131 9899 2129 8058 4335 8294",
+        "DF Machine": 29,
+        "DF Human": 0,
+        "Log DF Ratio": 3.4011973816621555
+      },
+      {
+        "N-Gram String": "695 14893 8673 1832 12204 4629",
+        "DF Machine": 29,
+        "DF Human": 0,
+        "Log DF Ratio": 3.4011973816621555
+      },
+      {
+        "N-Gram String": "17569 695 14893 8673 1832 12204",
+        "DF Machine": 28,
+        "DF Human": 0,
+        "Log DF Ratio": 3.367295829986474
+      },
+      {
+        "N-Gram String": "14893 8673 1832 12204 4629 16968",
+        "DF Machine": 28,
+        "DF Human": 0,
+        "Log DF Ratio": 3.367295829986474
+      },
+      {
+        "N-Gram String": "6173 17569 695 14893 8673 1832",
+        "DF Machine": 27,
+        "DF Human": 0,
+        "Log DF Ratio": 3.332204510175204
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "8294 17083 2191 17083 17083 2191",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      },
+      {
+        "N-Gram String": "8294 8294 8294 8294 12981 12516",
+        "DF Machine": 0,
+        "DF Human": 6,
+        "Log DF Ratio": -1.9459101490553135
+      },
+      {
+        "N-Gram String": "0 8294 12981 7014 13141 14212",
+        "DF Machine": 0,
+        "DF Human": 5,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "0 3006 3006 3006 3006 3006",
+        "DF Machine": 1,
+        "DF Human": 11,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "1007 7014 2870 3860 14245 11451",
+        "DF Machine": 0,
+        "DF Human": 4,
+        "Log DF Ratio": -1.6094379124341003
+      }
+    ]
+  },
+  "7-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "6173 17569 695 14893 8673 1832 12204",
+        "DF Machine": 26,
+        "DF Human": 0,
+        "Log DF Ratio": 3.295836866004329
+      },
+      {
+        "N-Gram String": "17569 695 14893 8673 1832 12204 4629",
+        "DF Machine": 25,
+        "DF Human": 0,
+        "Log DF Ratio": 3.258096538021482
+      },
+      {
+        "N-Gram String": "7391 6173 17569 695 14893 8673 1832",
+        "DF Machine": 25,
+        "DF Human": 0,
+        "Log DF Ratio": 3.258096538021482
+      },
+      {
+        "N-Gram String": "3641 7391 6173 17569 695 14893 8673",
+        "DF Machine": 24,
+        "DF Human": 0,
+        "Log DF Ratio": 3.2188758248682006
+      },
+      {
+        "N-Gram String": "695 14893 8673 1832 12204 4629 16968",
+        "DF Machine": 24,
+        "DF Human": 0,
+        "Log DF Ratio": 3.2188758248682006
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "8294 6764 3281 16257 12787 10348 14212",
+        "DF Machine": 0,
+        "DF Human": 5,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "0 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 1,
+        "DF Human": 11,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "8294 17083 2191 17083 17083 2191 17083",
+        "DF Machine": 0,
+        "DF Human": 5,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "1007 7014 2870 3860 14245 11451 8305",
+        "DF Machine": 0,
+        "DF Human": 4,
+        "Log DF Ratio": -1.6094379124341003
+      },
+      {
+        "N-Gram String": "7739 15348 3484 12960 807 14679 3281",
+        "DF Machine": 0,
+        "DF Human": 4,
+        "Log DF Ratio": -1.6094379124341003
+      }
+    ]
+  },
+  "8-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "7391 6173 17569 695 14893 8673 1832 12204",
+        "DF Machine": 24,
+        "DF Human": 0,
+        "Log DF Ratio": 3.2188758248682006
+      },
+      {
+        "N-Gram String": "3641 7391 6173 17569 695 14893 8673 1832",
+        "DF Machine": 23,
+        "DF Human": 0,
+        "Log DF Ratio": 3.1780538303479458
+      },
+      {
+        "N-Gram String": "6173 17569 695 14893 8673 1832 12204 4629",
+        "DF Machine": 23,
+        "DF Human": 0,
+        "Log DF Ratio": 3.1780538303479458
+      },
+      {
+        "N-Gram String": "17569 695 14893 8673 1832 12204 4629 16968",
+        "DF Machine": 21,
+        "DF Human": 0,
+        "Log DF Ratio": 3.091042453358316
+      },
+      {
+        "N-Gram String": "16170 14333 3641 7391 6173 17569 695 14893",
+        "DF Machine": 20,
+        "DF Human": 0,
+        "Log DF Ratio": 3.044522437723423
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "0 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 1,
+        "DF Human": 11,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "8294 6764 3281 16257 12787 10348 14212 1411",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "14245 7739 15348 3484 12960 807 14679 3281",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "12656 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "7739 15348 3484 12960 807 14679 3281 9899",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      }
+    ]
+  },
+  "9-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "3641 7391 6173 17569 695 14893 8673 1832 12204",
+        "DF Machine": 22,
+        "DF Human": 0,
+        "Log DF Ratio": 3.1354942159291497
+      },
+      {
+        "N-Gram String": "7391 6173 17569 695 14893 8673 1832 12204 4629",
+        "DF Machine": 21,
+        "DF Human": 0,
+        "Log DF Ratio": 3.091042453358316
+      },
+      {
+        "N-Gram String": "14333 3641 7391 6173 17569 695 14893 8673 1832",
+        "DF Machine": 19,
+        "DF Human": 0,
+        "Log DF Ratio": 2.995732273553991
+      },
+      {
+        "N-Gram String": "6173 17569 695 14893 8673 1832 12204 4629 16968",
+        "DF Machine": 19,
+        "DF Human": 0,
+        "Log DF Ratio": 2.995732273553991
+      },
+      {
+        "N-Gram String": "17948 16170 14333 3641 7391 6173 17569 695 14893",
+        "DF Machine": 18,
+        "DF Human": 0,
+        "Log DF Ratio": 2.9444389791664403
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "0 3006 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 1,
+        "DF Human": 11,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "7739 15348 3484 12960 807 14679 3281 9899 7739",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "14245 7739 15348 3484 12960 807 14679 3281 9899",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "12656 3006 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "3006 3006 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 23,
+        "DF Human": 88,
+        "Log DF Ratio": -1.3105825393841943
+      }
+    ]
+  },
+  "10-gram": {
+    "top_5_machine": [
+      {
+        "N-Gram String": "3641 7391 6173 17569 695 14893 8673 1832 12204 4629",
+        "DF Machine": 20,
+        "DF Human": 0,
+        "Log DF Ratio": 3.044522437723423
+      },
+      {
+        "N-Gram String": "14333 3641 7391 6173 17569 695 14893 8673 1832 12204",
+        "DF Machine": 18,
+        "DF Human": 0,
+        "Log DF Ratio": 2.9444389791664403
+      },
+      {
+        "N-Gram String": "16170 14333 3641 7391 6173 17569 695 14893 8673 1832",
+        "DF Machine": 17,
+        "DF Human": 0,
+        "Log DF Ratio": 2.8903717578961645
+      },
+      {
+        "N-Gram String": "7391 6173 17569 695 14893 8673 1832 12204 4629 16968",
+        "DF Machine": 17,
+        "DF Human": 0,
+        "Log DF Ratio": 2.8903717578961645
+      },
+      {
+        "N-Gram String": "13502 17948 16170 14333 3641 7391 6173 17569 695 14893",
+        "DF Machine": 16,
+        "DF Human": 0,
+        "Log DF Ratio": 2.833213344056216
+      }
+    ],
+    "top_5_human": [
+      {
+        "N-Gram String": "0 3006 3006 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 1,
+        "DF Human": 11,
+        "Log DF Ratio": -1.791759469228055
+      },
+      {
+        "N-Gram String": "14245 7739 15348 3484 12960 807 14679 3281 9899 7739",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "7739 15348 3484 12960 807 14679 3281 9899 7739 2579",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "12656 3006 3006 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 0,
+        "DF Human": 3,
+        "Log DF Ratio": -1.3862943611198906
+      },
+      {
+        "N-Gram String": "3006 3006 3006 3006 3006 3006 3006 3006 3006 3006",
+        "DF Machine": 23,
+        "DF Human": 83,
+        "Log DF Ratio": -1.252762968495368
+      }
+    ]
+  }
+}

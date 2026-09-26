@@ -1,0 +1,25 @@
+{
+  "stage": 3,
+  "stage_name": "Stage 3: Document-Level Log-DF Likelihood Ratio Pooling",
+  "features_added": [
+    "Mean Machine Affinity",
+    "Std Machine Affinity",
+    "Max Machine Affinity",
+    "Min Machine Affinity",
+    "Positive Affinity Ratio"
+  ],
+  "baseline_mean_acc": 89.22741039401508,
+  "stage1_mean_acc": 89.69247263796741,
+  "stage2_mean_acc": 90.30942759699528,
+  "stage3_mean_acc": 91.25856794330635,
+  "stage3_std_acc": 0.5533865137272069,
+  "delta_vs_baseline": 2.0311575492912652,
+  "delta_vs_previous_stage": 0.9491403463110686,
+  "fold_accuracies": [
+    90.98671726755218,
+    91.21974371143806,
+    90.69767441860465,
+    92.31134314190793,
+    91.07736117702895
+  ]
+}

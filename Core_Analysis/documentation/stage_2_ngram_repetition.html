@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stage 2: N-Gram Repetition & Token ID Profiling | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html" class="active">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4 (91.31%)</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html" class="active"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Stage_2_Ngram_Repetition_Token_Profiling.ipynb"><span>Notebook: Stage 2</span></a></li>
+        <li><a href="../data/stage_2_evaluation_metrics.json"><span>Metrics: Stage 2 JSON</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Stage 2: Repetition & Token Profiling</span>
+      </div>
+
+      <h1>Stage 2: Augmenting with Local N-Gram Repetition & Token ID Profiling</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        Detecting autoregressive Markovian transition loops and subword tokenizer vocabulary frequency shifts to push classification accuracy beyond 90%.
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">Stage 2 Milestone: Breaking the 90% Barrier</div>
+          <span class="badge badge-green">Accuracy: 90.31% (Δ = +1.08% vs. Base)</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          Adding 6 dense features capturing local n-gram repetition rates and tokenizer rank statistics produced a +0.62% jump over Stage 1, crossing the 90% accuracy milestone with a 5-fold standard deviation of only ±0.44%.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Stage 2 Accuracy</div>
+          <div class="metric-value" style="color: #16a34a;">90.31%</div>
+          <div class="metric-sub">±0.44% (5-Fold Stratified CV)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Gain vs. Stage 1</div>
+          <div class="metric-value" style="color: #d97706;">+0.62%</div>
+          <div class="metric-sub">Over Stage 1 (89.69%)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Gain vs. Baseline</div>
+          <div class="metric-value" style="color: #2563eb;">+1.08%</div>
+          <div class="metric-sub">Over Baseline (89.23%)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Macro F1 Score</div>
+          <div class="metric-value">89.17%</div>
+          <div class="metric-sub">Substantial gain across both classes</div>
+        </div>
+      </div>
+
+      <h2>1. The Six Features Added in Stage 2</h2>
+
+      <h3>1.1 Distinct Bigram & Trigram Ratios</h3>
+      <p>
+        Measures the uniqueness of consecutive token transitions across the entire essay:
+      </p>
+      <div class="formula-box">
+        $$\text{Distinct\_Bi} = \frac{|\{(t_i, t_{i+1}) : 1 \le i < L_d\}|}{L_d - 1}, \quad \text{Distinct\_Tri} = \frac{|\{(t_i, t_{i+1}, t_{i+2}) : 1 \le i < L_d - 1\}|}{L_d - 2}$$
+      </div>
+      <p>
+        <strong>Why it is added</strong>: Autoregressive language models generate text by iteratively sampling the next token conditioned on recent context attention. Under standard temperature parameters, decoders frequently fall into cyclic local phrasing patterns and repeat transitional idioms. Human writers demonstrate significantly higher syntactic and semantic variability in their local token transitions.
+      </p>
+
+      <h3>1.2 Subword Tokenizer Geometry (\(\mu_{\text{token\_id}}, \sigma_{\text{token\_id}}\))</h3>
+      <p>
+        In modern subword tokenization schemes (such as Byte-Pair Encoding or WordPiece), token integer IDs are assigned in strict decreasing order of corpus unigram frequency:
+      </p>
+      <ul>
+        <li><strong>Low Token IDs (\(< 3,000\))</strong>: Universal functional words ("the", "is", "which"), punctuation, and frequent prefixes.</li>
+        <li><strong>High Token IDs (\(> 10,000\))</strong>: Rare, domain-specific, morphological inflections, and idiosyncratic expressions.</li>
+      </ul>
+      <p>
+        We compute the empirical first and second central moments of the token ID sequence:
+      </p>
+      <div class="formula-box">
+        $$\mu_{\text{token\_id}} = \frac{1}{L_d} \sum_{i=1}^{L_d} t_i, \quad \sigma_{\text{token\_id}} = \sqrt{\frac{1}{L_d} \sum_{i=1}^{L_d} (t_i - \mu_{\text{token\_id}})^2}$$
+      </div>
+      <p>
+        <strong>Why it is added</strong>: Top-\(p\) nucleus sampling cuts off the tail of the vocabulary distribution during LLM generation. Human writers uninhibitedly deploy rare tail tokens, shifting the mean and spread of token IDs upward.
+      </p>
+
+      <h3>1.3 Vocabulary Quartile Ratios (\(Q_1, Q_4\))</h3>
+      <p>
+        Quantifying the exact boundary density of functional vs. tail tokens:
+      </p>
+      <div class="formula-box">
+        $$Q_1 = \frac{|\{t_i : t_i \le 3000\}|}{L_d}, \quad Q_4 = \frac{|\{t_i : t_i \ge 10000\}|}{L_d}$$
+      </div>
+
+      <h2>2. Empirical Class Separation</h2>
+      <p>
+        The table below shows the class-conditional empirical values across all 10,536 documents:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Machine Mean (Class B)</th>
+              <th>Human Mean (Class A)</th>
+              <th>Absolute Difference</th>
+              <th>Separation Direction</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Distinct Bigram Ratio</strong></td>
+              <td>0.912</td>
+              <td><strong>0.938</strong></td>
+              <td>0.026</td>
+              <td>Human transitions more diverse</td>
+            </tr>
+            <tr>
+              <td><strong>Distinct Trigram Ratio</strong></td>
+              <td>0.971</td>
+              <td><strong>0.984</strong></td>
+              <td>0.013</td>
+              <td>Human transitions more diverse</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Mean Token ID (\(\mu\))</strong></td>
+              <td>8,897.5</td>
+              <td><strong>9,033.3</strong></td>
+              <td><strong>135.8</strong></td>
+              <td>Human draws deeper from tail vocabulary</td>
+            </tr>
+            <tr>
+              <td><strong>Std Token ID (\(\sigma\))</strong></td>
+              <td>6,112.4</td>
+              <td><strong>6,189.7</strong></td>
+              <td>77.3</td>
+              <td>Human token IDs exhibit higher dispersion</td>
+            </tr>
+            <tr>
+              <td><strong>Q1 Functional Token Ratio</strong></td>
+              <td>0.312</td>
+              <td>0.301</td>
+              <td>0.011</td>
+              <td>Machine uses slightly more functional syntax</td>
+            </tr>
+            <tr>
+              <td><strong>Q4 Rare Token Ratio</strong></td>
+              <td>0.384</td>
+              <td><strong>0.399</strong></td>
+              <td>0.015</td>
+              <td>Human uses higher proportion of rare tokens</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>3. 5-Fold Stratified Cross-Validation Results</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Fold</th>
+              <th>Baseline</th>
+              <th>Stage 1</th>
+              <th>Stage 2</th>
+              <th>Stage 2 vs. Baseline</th>
+              <th>Stage 2 vs. Stage 1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Fold 1</td>
+              <td>89.33%</td>
+              <td>89.80%</td>
+              <td>90.18%</td>
+              <td>+0.85%</td>
+              <td>+0.38%</td>
+            </tr>
+            <tr>
+              <td>Fold 2</td>
+              <td>88.19%</td>
+              <td>88.80%</td>
+              <td>89.56%</td>
+              <td>+1.37%</td>
+              <td>+0.76%</td>
+            </tr>
+            <tr>
+              <td>Fold 3</td>
+              <td>89.80%</td>
+              <td>90.08%</td>
+              <td>90.89%</td>
+              <td>+1.09%</td>
+              <td>+0.81%</td>
+            </tr>
+            <tr>
+              <td>Fold 4</td>
+              <td>89.28%</td>
+              <td>89.75%</td>
+              <td>90.51%</td>
+              <td>+1.23%</td>
+              <td>+0.76%</td>
+            </tr>
+            <tr>
+              <td>Fold 5</td>
+              <td>89.55%</td>
+              <td>90.03%</td>
+              <td>90.41%</td>
+              <td>+0.86%</td>
+              <td>+0.38%</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Mean ± Std</strong></td>
+              <td><strong>89.23% ± 0.75%</strong></td>
+              <td><strong>89.69% ± 0.46%</strong></td>
+              <td><strong>90.31% ± 0.44%</strong></td>
+              <td><strong>+1.08% Gain</strong></td>
+              <td><strong>+0.62% Gain</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Key Finding: Token ID Geometry As an Independent Signal</div>
+        Because TF-IDF normalizes words based strictly on corpus term frequency without semantic rank knowledge, the tokenizer's pre-trained frequency index provides an orthogonal signal. Pairing token ID moments with local n-gram diversity allowed the Linear SVM to break the 90% boundary cleanly.
+      </div>
+
+      <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="stage_1_lexical_diversity.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous Stage</span>
+          <span class="nav-btn-title">&larr; Stage 1: Lexical Diversity</span>
+        </a>
+        <a href="stage_3_log_df_pooling.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Stage</span>
+          <span class="nav-btn-title">Stage 3: Log-DF Pooling &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>
