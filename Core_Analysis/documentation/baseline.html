@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Step 0: TF-IDF & Document Length Baseline | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html" class="active">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4 (91.31%)</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html" class="active"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../TFIDF_SVM_Ngram_Length_Classification_KFold.ipynb"><span>Notebook: Baseline Model</span></a></li>
+        <li><a href="../data/svm_ngram_1_to_5_length_accuracies.json"><span>Metrics: 1-5 Gram Accuracies</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Step 0: Baseline Setup</span>
+      </div>
+
+      <h1>Step 0: Establishing the TF-IDF & Document Length Baseline</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        Formulating the reference baseline for machine vs. human text classification using high-order cumulative \(N\)-gram TF-IDF representations combined with document length.
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">Baseline Benchmark Formulation</div>
+          <span class="badge badge-blue">Baseline Accuracy: 89.23% (±0.75%)</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          Before introducing dense linguistic feature descriptors, we thoroughly optimized the classical sparse \(N\)-gram representation space, discovering that cumulative 1-to-5 grams with document length achieved the optimal bias-variance tradeoff.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Corpus Size</div>
+          <div class="metric-value">10,536</div>
+          <div class="metric-sub">6,837 Machine / 3,699 Human</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">TF-IDF Dimension</div>
+          <div class="metric-value">248,349</div>
+          <div class="metric-sub">Cumulative 1-to-5 grams (\(\text{min\_df}=3\))</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Cross-Val Accuracy</div>
+          <div class="metric-value" style="color: #2563eb;">89.23%</div>
+          <div class="metric-sub">±0.75% across 5 folds</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sparsity</div>
+          <div class="metric-value">> 99.8%</div>
+          <div class="metric-sub">High-dimensional sparse CSR matrix</div>
+        </div>
+      </div>
+
+      <h2>1. The Mathematics of Cumulative \(N\)-Gram TF-IDF</h2>
+      <p>
+        In text classification, higher-order \(N\)-grams capture multi-word idiomatic collocations and local phrase structures. For each token or \(n\)-gram \(t\) in document \(d\), the sublinear TF-IDF weight is defined as:
+      </p>
+
+      <div class="formula-box">
+        $$\text{tf-idf}(t, d) = \big(1 + \ln \text{tf}(t, d)\big) \cdot \left(\ln \frac{1 + |D|}{1 + \text{df}(t)} + 1\right)$$
+      </div>
+
+      <p>
+        where \(\text{tf}(t, d)\) is the frequency of \(t\) in \(d\), and \(\text{df}(t)\) is the document frequency across corpus \(D\). Each document vector is subsequently \(L_2\)-normalized:
+      </p>
+
+      <div class="formula-box">
+        $$\mathbf{x}_{\text{tfidf}}(d) = \frac{\mathbf{v}_d}{\|\mathbf{v}_d\|_2}$$
+      </div>
+
+      <h2>2. Why Document Length is a Vital Authorship Signal</h2>
+      <p>
+        A fundamental stylistic discrepancy between human authors and instruction-following generative language models lies in their length distributions. In this corpus:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Sample Count</th>
+              <th>Mean Document Length (\(L_d\))</th>
+              <th>Std Dev</th>
+              <th>Separation Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Machine (Class B)</strong></td>
+              <td>6,837</td>
+              <td><strong>419.6 tokens</strong></td>
+              <td>±164.2</td>
+              <td rowspan="2" style="vertical-align: middle; font-weight: 700; color: #dc2626;">1.78× Separation</td>
+            </tr>
+            <tr>
+              <td><strong>Human (Class A)</strong></td>
+              <td>3,699</td>
+              <td><strong>747.8 tokens</strong></td>
+              <td>±298.5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Human writers typically produce longer, meandering essays with extensive contextual development, whereas LLMs conditioned on concise prompts produce structured essays of moderate length.
+      </p>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Length Augmentation Impact</div>
+        Appending scaled document length to cumulative 1-5 gram TF-IDF increased 5-fold CV accuracy from <strong>88.66%</strong> to <strong>89.23% (+0.57%)</strong>, establishing our definitive baseline.
+      </div>
+
+      <h2>3. \(N\)-Gram Horizon Optimization: Why Stop at 5-Grams?</h2>
+      <p>
+        We conducted systematic experiments expanding the cumulative \(N\)-gram window up to 7-grams:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Configuration</th>
+              <th>Features (\(P\))</th>
+              <th>Accuracy Without Length</th>
+              <th>Accuracy With Length</th>
+              <th>Observation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pure 1-Gram</td>
+              <td>12,582</td>
+              <td>84.18%</td>
+              <td>85.02%</td>
+              <td>Baseline unigrams</td>
+            </tr>
+            <tr>
+              <td>Cumulative 1-2 Gram</td>
+              <td>64,120</td>
+              <td>87.26%</td>
+              <td>87.94%</td>
+              <td>Captures bigram transitions</td>
+            </tr>
+            <tr>
+              <td>Cumulative 1-3 Gram</td>
+              <td>142,890</td>
+              <td>88.19%</td>
+              <td>88.85%</td>
+              <td>Captures trigram idioms</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Cumulative 1-5 Gram (Baseline)</strong></td>
+              <td><strong>248,349</strong></td>
+              <td><strong>88.66%</strong></td>
+              <td><strong>89.23%</strong></td>
+              <td><strong>Optimal capacity vs. sparsity balance</strong></td>
+            </tr>
+            <tr>
+              <td>Cumulative 1-7 Gram</td>
+              <td>376,826</td>
+              <td>88.71%</td>
+              <td>89.26%</td>
+              <td>Diminishing returns (+0.03%), 50% more features</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Moving beyond 5-grams yields negligible gain (+0.03%) at the cost of severe sparsity and overfitting risk. Thus, <strong>Cumulative 1-5 Gram TF-IDF + Document Length (89.23%)</strong> serves as the strict reference baseline.
+      </p>
+
+      <h2>4. The Fundamental Limitation of Sparse Bag-of-Words</h2>
+      <p>
+        While achieving an impressive 89.23% accuracy, the TF-IDF representation suffers from intrinsic conceptual blind spots:
+      </p>
+
+      <ol>
+        <li><strong>Invariance to Vocabulary Richness</strong>: A text with 100 unique words repeated 10 times has identical nonzero coordinates to a text with 1,000 diverse words.</li>
+        <li><strong>Blindness to Subword Frequency Ranks</strong>: TF-IDF treats frequent function tokens and rare tail vocabulary symmetrically according to corpus inverse frequency, failing to capture autoregressive sampling truncation.</li>
+        <li><strong>Loss of Temporal Dynamics</strong>: Shuffling all sentences or tokens preserves the exact same TF-IDF vector, ignoring cognitive burstiness and narrative progression.</li>
+      </ol>
+
+      <p>
+        These structural shortcomings motivated the 4-stage dense feature augmentation program.
+      </p>
+
+      <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="index.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous</span>
+          <span class="nav-btn-title">&larr; Executive Overview</span>
+        </a>
+        <a href="stage_1_lexical_diversity.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Stage</span>
+          <span class="nav-btn-title">Stage 1: Lexical Diversity & Entropy &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

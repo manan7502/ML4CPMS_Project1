@@ -1,0 +1,146 @@
+{
+  "majority_baseline_pct": 64.89179954441914,
+  "individual_svm_models_1_to_7": [
+    {
+      "N-Gram Order": "1-gram",
+      "k": 1,
+      "Features": 12582,
+      "Fold 1 Acc": 83.34914611005692,
+      "Fold 2 Acc": 81.30042714760323,
+      "Fold 3 Acc": 82.91409587090651,
+      "Fold 4 Acc": 83.2937826293308,
+      "Fold 5 Acc": 82.77171333649738,
+      "Mean Acc (%)": 82.72583301887897,
+      "Std Acc (%)": 0.7457098326442888,
+      "Macro F1 (%)": 80.60222582118448,
+      "Delta Baseline (%)": 17.83403347445983,
+      "Time (s)": 2.0682625770568848
+    },
+    {
+      "N-Gram Order": "2-gram",
+      "k": 2,
+      "Features": 98224,
+      "Fold 1 Acc": 83.34914611005692,
+      "Fold 2 Acc": 83.05647840531562,
+      "Fold 3 Acc": 85.00237304224015,
+      "Fold 4 Acc": 84.48030374940674,
+      "Fold 5 Acc": 85.1922164214523,
+      "Mean Acc (%)": 84.21610354569435,
+      "Std Acc (%)": 0.8645418990963873,
+      "Macro F1 (%)": 81.98352133519059,
+      "Delta Baseline (%)": 19.32430400127521,
+      "Time (s)": 3.7949883937835693
+    },
+    {
+      "N-Gram Order": "3-gram",
+      "k": 3,
+      "Features": 78396,
+      "Fold 1 Acc": 81.40417457305503,
+      "Fold 2 Acc": 81.34788799240627,
+      "Fold 3 Acc": 81.91741813004272,
+      "Fold 4 Acc": 82.15472235405791,
+      "Fold 5 Acc": 82.5344091124822,
+      "Mean Acc (%)": 81.87172243240883,
+      "Std Acc (%)": 0.45040741772342197,
+      "Macro F1 (%)": 79.02327139286332,
+      "Delta Baseline (%)": 16.979922887989687,
+      "Time (s)": 3.787728786468506
+    },
+    {
+      "N-Gram Order": "4-gram",
+      "k": 4,
+      "Features": 40614,
+      "Fold 1 Acc": 78.0360531309298,
+      "Fold 2 Acc": 77.55102040816327,
+      "Fold 3 Acc": 78.97484575225438,
+      "Fold 4 Acc": 79.02230659705742,
+      "Fold 5 Acc": 79.40199335548172,
+      "Mean Acc (%)": 78.59724384877731,
+      "Std Acc (%)": 0.6899857702176807,
+      "Macro F1 (%)": 74.81968285860691,
+      "Delta Baseline (%)": 13.705444304358167,
+      "Time (s)": 3.6504790782928467
+    },
+    {
+      "N-Gram Order": "5-gram",
+      "k": 5,
+      "Features": 23980,
+      "Fold 1 Acc": 74.52561669829223,
+      "Fold 2 Acc": 73.99145704793546,
+      "Fold 3 Acc": 74.5609871855719,
+      "Fold 4 Acc": 74.4186046511628,
+      "Fold 5 Acc": 77.40863787375415,
+      "Mean Acc (%)": 74.9810606913433,
+      "Std Acc (%)": 1.230666008777424,
+      "Macro F1 (%)": 69.02068778000356,
+      "Delta Baseline (%)": 10.089261146924159,
+      "Time (s)": 3.606499671936035
+    }
+  ],
+  "cumulative_models_1_to_7": [
+    {
+      "Configuration": "(1, 1) Pure Unigram",
+      "N-Gram Range": "(1, 1)",
+      "Features": 12582,
+      "Mean Acc (%)": 82.72583301887897,
+      "Std (%)": 0.7457098326442888,
+      "Time (s)": 2.0191445350646973
+    },
+    {
+      "Configuration": "(2, 2) Pure Bigram",
+      "N-Gram Range": "(2, 2)",
+      "Features": 98224,
+      "Mean Acc (%)": 84.21610354569435,
+      "Std (%)": 0.8645418990963873,
+      "Time (s)": 3.6865148544311523
+    },
+    {
+      "Configuration": "(1, 2) Cumulative Uni+Bi",
+      "N-Gram Range": "(1, 2)",
+      "Features": 110806,
+      "Mean Acc (%)": 86.484407716575,
+      "Std (%)": 0.6276144694367906,
+      "Time (s)": 5.3099071979522705
+    },
+    {
+      "Configuration": "(1, 3) Cumulative Uni+Bi+Tri",
+      "N-Gram Range": "(1, 3)",
+      "Features": 189202,
+      "Mean Acc (%)": 87.79423247168334,
+      "Std (%)": 0.5087909517774135,
+      "Time (s)": 8.460126638412476
+    },
+    {
+      "Configuration": "(1, 4) Cumulative 1-to-4 Gram",
+      "N-Gram Range": "(1, 4)",
+      "Features": 229816,
+      "Mean Acc (%)": 88.4206525821131,
+      "Std (%)": 0.7670502800249007,
+      "Time (s)": 11.820180654525757
+    },
+    {
+      "Configuration": "(1, 5) Cumulative 1-to-5 Gram",
+      "N-Gram Range": "(1, 5)",
+      "Features": 253796,
+      "Mean Acc (%)": 88.85727434259525,
+      "Std (%)": 0.6961152856792931,
+      "Time (s)": 15.09149432182312
+    },
+    {
+      "Configuration": "(1, 6) Cumulative 1-to-6 Gram",
+      "N-Gram Range": "(1, 6)",
+      "Features": 270714,
+      "Mean Acc (%)": 89.0660570304641,
+      "Std (%)": 0.8057998365552088,
+      "Time (s)": 19.603496074676514
+    },
+    {
+      "Configuration": "(1, 7) Cumulative 1-to-7 Gram",
+      "N-Gram Range": "(1, 7)",
+      "Features": 283792,
+      "Mean Acc (%)": 89.11350436648779,
+      "Std (%)": 0.6922538554115361,
+      "Time (s)": 22.74270510673523
+    }
+  ]
+}

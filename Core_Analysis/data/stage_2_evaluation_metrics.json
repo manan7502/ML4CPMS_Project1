@@ -1,0 +1,25 @@
+{
+  "stage": 2,
+  "stage_name": "Stage 2: Local N-Gram Repetition & Token ID Profiling",
+  "features_added": [
+    "Distinct Bigram Ratio",
+    "Distinct Trigram Ratio",
+    "Mean Token ID",
+    "Std Token ID",
+    "Q1 Functional Token Ratio",
+    "Q4 Rare Token Ratio"
+  ],
+  "baseline_mean_acc": 89.22741039401508,
+  "stage1_mean_acc": 89.69247263796741,
+  "stage2_mean_acc": 90.30942759699528,
+  "stage2_std_acc": 0.43924123871842613,
+  "delta_vs_baseline": 1.0820172029801967,
+  "delta_vs_previous_stage": 0.6169549590278649,
+  "fold_accuracies": [
+    90.18026565464896,
+    89.55861414333175,
+    90.8875177978168,
+    90.5078310393925,
+    90.41290934978643
+  ]
+}

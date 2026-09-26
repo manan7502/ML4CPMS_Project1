@@ -1,0 +1,66 @@
+{
+  "experiment": "Main115 strict cross-fitted specialist consensus correction",
+  "n_splits": 5,
+  "feature_dim": 62,
+  "teacher_oof_accuracy": 0.9195538680588514,
+  "teacher_val_accuracy": 0.9302656546489564,
+  "specialists": {
+    "LR_C1": {
+      "oof_accuracy": 0.925249169435216,
+      "oof_auc": 0.9748252014441778,
+      "val_accuracy": 0.9283681214421252,
+      "val_auc": 0.9795084558242454
+    },
+    "HGB_small": {
+      "oof_accuracy": 0.9326056003796868,
+      "oof_auc": 0.9785636217678665,
+      "val_accuracy": 0.9302656546489564,
+      "val_auc": 0.9824778726094516
+    },
+    "HGB_medium": {
+      "oof_accuracy": 0.9320123398196488,
+      "oof_auc": 0.9782874638712988,
+      "val_accuracy": 0.928842504743833,
+      "val_auc": 0.9824255176228861
+    },
+    "RandomForest": {
+      "oof_accuracy": 0.9314190792596109,
+      "oof_auc": 0.9783022944587179,
+      "val_accuracy": 0.924573055028463,
+      "val_auc": 0.9819414809546388
+    },
+    "ExtraTrees": {
+      "oof_accuracy": 0.9296392975794969,
+      "oof_auc": 0.9788059782839414,
+      "val_accuracy": 0.9188804554079696,
+      "val_auc": 0.9825322032558875
+    }
+  },
+  "selected_rule": {
+    "k": 2,
+    "margin": 0.15,
+    "confidence": 0.55,
+    "oof_changes": 201,
+    "oof_correct": 156,
+    "oof_wrong": 45,
+    "oof_change_precision": 0.7761194029850746,
+    "oof_accuracy_after": 0.9327242524916943,
+    "oof_delta": 0.013170384432842908
+  },
+  "selection_reason": "positive OOF delta + >=65% correction precision",
+  "selected_rule_frozen_validation": {
+    "accuracy": 0.9345351043643264,
+    "delta": 0.004269449715370022,
+    "changes": 45,
+    "correct_changes": 27,
+    "wrong_changes": 18
+  },
+  "selected_rule_oof": {
+    "accuracy": 0.9327242524916943,
+    "delta": 0.013170384432842908,
+    "changes": 201,
+    "correct_changes": 156,
+    "wrong_changes": 45
+  },
+  "note": "Specialist probabilities on the 8428 Main64 OOF rows are 5-fold cross-fitted. The consensus rule is selected only from those cross-fitted predictions and then frozen for validation."
+}

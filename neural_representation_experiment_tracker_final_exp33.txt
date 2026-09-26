@@ -1,0 +1,2804 @@
+NEURAL REPRESENTATION LEARNING EXPERIMENT SERIES
+ML4CPMS Project 1 — Human vs Machine-Generated Text
+======================================================
+
+Purpose
+-------
+Systematically test whether CNNs, RNNs, Transformers, autoencoders,
+contrastive learning, and multi-input neural networks can learn latent
+document vectors that separate the two classes better than our current
+classical pipeline.
+
+CURRENT REFERENCE
+-----------------
+Main64 validation accuracy : 93.0266%
+Main115 validation accuracy: 93.4535%
+Main115 is the current local validation reference.
+
+IMPORTANT
+---------
+- Run experiments one by one.
+- Keep the canonical 80/20 stratified split, random_state=42.
+- Do not submit to Kaggle unless explicitly decided later.
+- For promising experiments, save the learned train/validation embeddings.
+- Evaluate both the neural classifier and simple classifiers on the learned
+  embedding whenever practical.
+- The goal is not only accuracy: determine whether the learned latent vector
+  contains genuinely useful/separable information.
+
+STATUS KEY
+----------
+[ ] Not started
+[~] Running / in progress
+[✓] Completed
+[-] Retired / not worth pursuing further / killed before execution
+
+
+PHASE 1 — SINGLE REPRESENTATION ENCODERS
+========================================
+
+1. [✓] RAW TOKENS → CNN → LATENT VECTOR
+    Input: token ID sequence
+    Encoder: embedding + CNN
+    Output: learned document vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+2. [✓] RAW TOKENS → BiGRU → LATENT VECTOR
+    Input: token ID sequence
+    Encoder: embedding + BiGRU + pooling
+    Output: learned document vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+3. [✓] RAW TOKENS → TRANSFORMER → LATENT VECTOR
+    Input: token ID sequence
+    Encoder: embedding + Transformer + pooling
+    Output: learned document vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+4. [✓] TF-IDF → SVD → MLP ENCODER
+    Input: word/token TF-IDF
+    Compression: SVD
+    Encoder: MLP
+    Output: learned vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+5. [✓] TRANSITION TF-IDF → SVD → MLP ENCODER
+    Input: adjacent-token transition TF-IDF
+    Compression: SVD
+    Encoder: MLP
+    Output: learned vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+6. [✓] STRUCTURAL FEATURES → MLP → LATENT VECTOR
+    Input: compact structural/statistical features
+    Encoder: MLP
+    Output: learned vector z
+    Evaluate: neural classifier, SVM(z), LR(z)
+
+
+PHASE 2 — PAIRWISE REPRESENTATION FUSION
+========================================
+
+7.  [✓] TOKENS + TF-IDF
+     Token encoder + TF-IDF encoder → fusion MLP → z
+
+8.  [✓] TOKENS + STRUCTURAL
+     Token encoder + structural MLP → fusion MLP → z
+
+9.  [✓] TOKENS + TRANSITION TF-IDF
+     Token encoder + transition encoder → fusion MLP → z
+
+10. [✓] TF-IDF + TRANSITION TF-IDF
+     TF-IDF encoder + transition encoder → fusion MLP → z
+
+11. [✓] TF-IDF + STRUCTURAL
+     TF-IDF encoder + structural MLP → fusion MLP → z
+
+12. [✓] TRANSITION TF-IDF + STRUCTURAL
+     Transition encoder + structural MLP → fusion MLP → z
+
+
+PHASE 3 — LARGER MULTI-REPRESENTATION FUSION
+=============================================
+
+13. [✓] TOKENS + TF-IDF + STRUCTURAL
+     Three branches → fusion → z
+
+14. [✓] TOKENS + TF-IDF + TRANSITION TF-IDF
+     Three branches → fusion → z
+
+15. [✓] TOKENS + TRANSITION TF-IDF + STRUCTURAL
+     Three branches → fusion → z
+
+16. [✓] TF-IDF + TRANSITION TF-IDF + STRUCTURAL
+     No raw token input
+     Three branches → fusion → z
+
+17. [✓] EVERYTHING
+     Tokens + TF-IDF + transition TF-IDF + structural features
+     Separate encoders → fusion network → final latent vector z
+
+
+PHASE 4 — MAKE THE LATENT SPACE CLASS-SEPARABLE
+================================================
+
+Apply to the best promising architectures from Phases 1–3.
+
+18. [✓] BEST MODEL + CROSS-ENTROPY
+     Standard supervised classification objective.
+     Baseline for learned latent space.
+
+19. [✓] BEST MODEL + CROSS-ENTROPY + CONTRASTIVE LOSS
+     L = L_CE + lambda * L_contrastive
+     Encourage same-class vectors to be close and different-class
+     vectors to be separated.
+
+20. [✓] BEST MODEL + SUPERVISED CONTRASTIVE LEARNING
+     Train the representation primarily for class separation.
+     Evaluate the learned embedding independently with SVM/LR.
+
+
+PHASE 5 — AUTOENCODER REPRESENTATION LEARNING
+=============================================
+
+21. [-] TF-IDF AUTOENCODER
+     TF-IDF → encoder → z → decoder → reconstructed TF-IDF
+     Test whether a compact latent representation preserves useful
+     information.
+
+22. [✓] TF-IDF SUPERVISED AUTOENCODER
+     TF-IDF → encoder → z
+                       ├→ decoder → reconstruction
+                       └→ classifier → A/B
+     L = L_reconstruction + lambda * L_CE
+
+23. [✓] TF-IDF + CONTRASTIVE SUPERVISED AUTOENCODER
+     L = L_reconstruction + lambda1 * L_CE
+                       + lambda2 * L_contrastive
+
+
+PHASE 6 — MULTI-INPUT LATENT AUTOENCODERS
+==========================================
+
+24. [✓] TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT VECTOR
+     Multiple encoders → shared z
+     Train with reconstruction + classification objectives.
+     No raw token sequence.
+
+25. [✓] TOKENS + TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT VECTOR
+     Transformer token branch + classical-data branches
+     → shared latent z
+     → classification + reconstruction/contrastive objectives.
+
+
+PHASE 7 — ADD EXISTING CLASSICAL KNOWLEDGE
+===========================================
+
+Only apply these to the strongest learned representations.
+
+26. [✓] LEARNED VECTOR + MAIN64 FEATURES
+     z_learned + Main64 representation → classifier/fusion
+
+27. [✓] LEARNED VECTOR + MAIN115 SPECIALIST OUTPUTS
+     Main145 learned vector + Main115 specialist information → classifier/fusion
+     Simple LR/SVM concatenation tested; configuration retired, but
+     measurable complementarity was observed. Strongest Exp13/Main133
+     representation should be tested next before concluding learned+Main115
+     fusion is ineffective.
+
+28. [✓] LEARNED VECTOR + MAIN64 + MAIN115
+     Combine the learned representation with the strongest existing
+     classical information.
+
+
+PHASE 8 — FINAL REPRESENTATION AUDIT
+=====================================
+
+For the strongest learned representations, measure:
+
+29. [✓] EMBEDDING LINEAR SEPARABILITY
+     SVM/LR accuracy and AUC using only z.
+
+30. [✓] EMBEDDING DISTANCE ANALYSIS
+     Within-class distance
+     Between-class distance
+     Between/within distance ratio
+
+31. [✓] EMBEDDING NEAREST-NEIGHBOR ANALYSIS
+     kNN class consistency in learned latent space.
+
+32. [✓] EMBEDDING VISUALIZATION
+     PCA / UMAP / t-SNE where useful.
+     Check whether the two classes form visibly separated regions.
+
+Geometry/classifier audit note:
+- Do not run a full local-geometry/nonlinear-classifier study after every
+  experiment during the broad 33-experiment sweep. That would multiply
+  experiments and encourage repeated validation-set tuning.
+- After the sweep, apply the detailed audit to the strongest saved
+  representations, especially Exp13/Main133 and Exp11/Main131, plus any
+  representation that proves complementary under strict OOF testing.
+- Test kNN/local-neighborhood purity and local-distance features using
+  training embeddings only when querying validation embeddings.
+- Also test nonlinear classifiers on the strongest learned vectors
+  (for example RBF-style models or small nonlinear heads). Any model
+  selection or fusion that learns from predictions should use strict OOF
+  predictions where appropriate.
+
+33. [✓] FINAL COMPARISON AGAINST MAIN115
+     Compare the best learned representation and any final fusion
+     against the 93.4535% Main115 validation reference.
+
+
+DECISION RULE
+=============
+After each experiment:
+
+1. Record validation accuracy and AUC.
+2. Record whether SVM/LR on the learned vector performs well.
+3. Check whether the representation adds information beyond existing
+   classical features.
+4. If clearly weak, mark the branch [-] and do not spend excessive time
+   tuning it.
+5. If promising, carry it into the next phase.
+6. Only the strongest representations proceed to the expensive phases.
+
+
+EXPERIMENT LOG
+==============
+
+Experiment | Status | Val Acc  | AUC | SVM-on-z | Notes
+-----------|--------|----------|-----|----------|------
+1          | [✓]    | 77.0873% | 0.8414 | 78.0361% | Retired: CNN latent representation weak; SVM-on-z 78.0361%. 3.06M params, z=128, max_len=384. Between/within=1.2787.
+2          | [✓]    | 79.0797% | 0.8835 | 81.0247% | Retired: BiGRU latent representation weak; SVM/LR on z only 81.0247%. 2.62M params, z=128, max_len=384. Between/within=0.6627.
+3          | [✓]    | 79.0323% | 0.8872 | 79.2220% | Retired standalone; LR-on-z 79.5066%. Strongest raw-token neural AUC so far. Embeddings/checkpoint retained for later detailed tuning and complementary fusion.
+4          | [✓]    | 81.4991% | 0.9296 | 78.9848% | Retired standalone; high AUC but weak accuracy. SVD retained 17.43% variance; MLP overfit quickly. Embeddings retained as a potentially complementary representation.
+5          | [✓]    | 77.8463% | 0.8964 | 75.0000% | Retired standalone; transition representation weaker than word/token TF-IDF. LR-on-z 75.6641%, AUC 0.8958. SVD retained 14.52% variance; MLP overfit after epoch 2. Embeddings retained for record/complementarity.
+6          | [✓]    | 80.8824% | 0.8888 | 80.0285% | Retired standalone; structural MLP is weaker than TF-IDF/SVD. LR-on-z 79.9336%, AUC 0.8889. 62-D features, 33,441 params, best epoch 8, between/within=1.2411.
+7          | [✓]    | 82.9696% | 0.9412 | 87.1442% | Retired standalone; strong latent signal but rapid overfitting. Neural best epoch 1. SVM/LR on z: 87.1442%/86.6698%. 13.51M params, z=128, direct 60k TF-IDF, no SVD. Between/within=2.2469. Embeddings retained for later fusion.
+8          | [✓]    | 83.4440% | 0.9410 | 85.9583% | Retired standalone; LR-on-z 86.4326% and AUC 0.9432 show useful signal, but accuracy remains far below Main115. Best epoch 2; rapid overfitting. 1.55M params, z=128, 62 structural features, between/within=1.7530.
+9          | [✓]    | 84.5351% | 0.9167 | 83.1594% | Retired standalone; best epoch 1. Neural AUC 0.9167, LR-on-z 83.1594% (AUC 0.9138), SVM-on-z 83.1594% (AUC 0.8689). 16.92M params, z=128, 60k transition TF-IDF, no SVD. Between/within=2.1742. Severe overfitting after epoch 1; embeddings retained for possible complementary fusion.
+10         | [✓]    | 83.9184% | 0.9504 | 87.9507% | Retired standalone; best epoch 1. Neural AUC 0.9504, LR-on-z 88.0930% (AUC 0.9486), SVM-on-z 87.9507% (AUC 0.9462). 30.86M params, z=128, 60k word TF-IDF + 60k transition TF-IDF, no SVD. Between/within=1.9684. Very rapid overfitting; embeddings retained for complementary fusion.
+11         | [✓]    | 89.8482% | 0.9626 | 90.3700% | Retired standalone; strongest Phase 2 AUC so far after Exp10: neural AUC 0.9626, LR-on-z AUC 0.9664, SVM-on-z 90.3700%. Best-loss epoch 1; rapid overfitting. 7.76M params, z=128, 60k word TF-IDF + 62 structural features, between/within=1.3320. Embeddings retained for complementary fusion.
+12         | [✓]    | 88.2353% | 0.9520 | 88.1879% | Retired standalone; neural AUC 0.9520, LR-on-z AUC 0.9560, SVM-on-z 88.1879%. Best-loss epoch 1; rapid overfitting. 7.76M params, z=128, 60k transition TF-IDF + 62 structural features, between/within=1.3214. Embeddings retained for possible complementary strict-OOF fusion.
+13         | [✓]    | 89.6110% | 0.9578 | 89.6110% | Retired standalone; LR-on-z 90.7970% with AUC 0.9695, neural AUC 0.9578. Best-loss epoch 3; rapid overfitting after epoch 3. 1.68M params, z=128, raw tokens + 60k word TF-IDF/SVD256 + 62 structural. Between/within=2.6510. Strong representation, but below Main115; retain embeddings for strict-OOF complementarity.
+14         | [✓]    | 83.9658% | 0.9400 | 86.6698% | Retired: three-way tokens + word TF-IDF + transition TF-IDF. LR-on-z 87.7609%, AUC 0.9529. Best epoch 4; strong overfitting after epoch 4. 1.71M params, z=128, SVD256 for word and transition branches. Between/within=2.6008. Weaker than Exp13/Main133 and Main131; embeddings retained only for possible complementarity.
+15         | [✓]    | 87.0493% | 0.9514 | 88.2827% | Retired standalone; LR-on-z 88.6622%, AUC 0.9525. Best epoch 3; strong overfitting after epoch 3. 1.56M params, z=128, raw tokens + transition TF-IDF/SVD256 + 62-D structural. Between/within=2.7897. Weaker than Exp13/Main133; embeddings retained for possible strict-OOF complementarity.
+16         | [✓]    | 82.8273% | 0.9495 | 86.3852% | Retired standalone; LR-on-z 86.6224% (AUC 0.9504). Best epoch 2; strong overfitting after epoch 2. 304,257 params, z=128, word TF-IDF/SVD256 + transition TF-IDF/SVD256 + 62-D structural. Between/within=2.3794.
+17         | [✓]    | 87.5237% | 0.9512 | 87.2391% | Retired standalone; LR-on-z 87.6186%, AUC 0.9560. Best-loss epoch 3; strong overfitting after epoch 3. 1.60M params, z=128, raw tokens + word TF-IDF/SVD256 + transition TF-IDF/SVD256 + 62-D structural. Between/within=2.9189. Weaker than Exp13/Main133 and Main131; embeddings retained for possible strict-OOF complementarity.
+18         | [✓]    | 86.2903% | 0.9540 | 88.0455% | Retired standalone; LR-on-z 87.8558%, AUC 0.9587. Best epoch 2 by validation loss; strong overfitting after epoch 2. 1.56M params, z=128, raw tokens + word TF-IDF/SVD256 + 62-D structural. Between/within=2.8860. BCE baseline does not improve Exp13/Main133.
+19         | [✓]    | 88.7097% | 0.9600 | 88.2827% | Retired standalone; LR-on-z 88.5674%, AUC 0.9599. Best-loss epoch 3; strong overfitting after epoch 3. 2.14M params, z=128, raw tokens + word TF-IDF/SVD256 + 62-D structural, BCE + supervised pairwise contrastive loss (lambda 0.1, margin 0.2). Between/within=2.2636. Does not improve Exp13/Main133 or Exp18; embeddings retained for possible complementary strict-OOF fusion.
+20         | [✓]    | 87.9507% | 0.9532 | 87.8083% | Retired standalone; LR-on-z 87.9507%, AUC 0.9532. Best epoch 3. Pure supervised contrastive objective did not improve Exp19/Exp13; embeddings retained for possible strict-OOF complementarity.
+21         | [✓]    | N/A      | N/A    | N/A      | Killed after epoch 1 during TF-IDF autoencoder due to resource exhaustion; 60,000-D dense reconstruction with 61.83M parameters is impractical on current laptop. Do not tune locally; redesign to sparse/bottleneck/chunked or use larger GPU if revisited.
+22         | [✓]    | 82.4478% | 0.9437 | 82.1632% | Retired standalone; LR-on-z 82.4478%, AUC 0.9437. Memory-safe SVD512 autoencoder (328,961 params) with reconstruction + BCE. Best epoch 4; clear classification overfitting after epoch 4. Useful latent signal but far below Exp13/Main133 and Exp19; retain embeddings for possible complementarity. would like to test in notebook
+23         | [✓]    | 82.5901% | 0.9411 | 82.9696% | Retired standalone; memory-safe TF-IDF→SVD512 autoencoder + BCE + supervised pairwise contrastive loss. Best-loss epoch 3; SVM/LR on z 82.97%/83.40%, LR AUC 0.9412. Between/within=2.8897. Slight accuracy gain over Exp22 LR, but no meaningful improvement in AUC or overall representation quality; clear overfitting. Retain embeddings for possible strict-OOF complementarity. would like to test in notebook
+24         | [✓]    | 86.7173% | 0.9592 | 85.1518% | Retired standalone; shared-latent multi-input autoencoder using word TF-IDF/SVD256 + transition TF-IDF/SVD256 + 62-D structural features, with reconstruction + BCE + supervised pairwise contrastive loss. Best-loss epoch 13; LR-on-z 86.1006%, AUC 0.9588. Between/within=3.1995, the highest geometry ratio in this sweep so far, but this did not translate into stronger classification. Clear overfitting and below Exp13/Main133/Exp19; retain embeddings for possible strict-OOF complementarity. Structural extractor is a reconstructed 62-D feature set, not verified byte-identical to canonical Main64. would like to test in notebook
+25         | [✓]    | 89.0892% | 0.9510 | 88.5674% | Retired standalone; Main145 shared-latent autoencoder using tokens + word TF-IDF + transition TF-IDF + structural features. LR-on-z 88.4250%, AUC 0.9516. Best-loss epoch 6; strong overfitting after selected epoch. 1.864M params, z=128, between/within=2.5216. Higher neural accuracy than Exp17/Exp19 but below Exp13/Main133 and Main131; learned latent is not strong enough to replace the classical reference. Embeddings/checkpoint retained for later strict-OOF complementarity.
+26         | [✓]    | 88.5199% | 0.9506 | 88.0455% | Exp26/Main146: Exp25 shared latent + frozen Main64 teacher-score distillation. Best-loss epoch 2; LR-on-z 88.3302%, AUC 0.9523; SVM-on-z 88.0455%, AUC 0.9519. 1.685M params, z=128, teacher weight 0.15, reconstruction 1.0, contrastive 0.1. Between/within=1.4096. Below Exp25 neural accuracy (89.0892%) and below Exp13/Main133 / Main115; teacher distillation did not improve the Exp25 latent. Retire standalone, retain embeddings/checkpoint for possible strict-OOF complementarity.
+27         | [✓]    | 89.3738% | 0.9839 | 89.5636% | Main147/Exp27: Main145 z + five Main115 specialist probabilities. LR fused 89.3738% (AUC 0.9639); SVM fused 89.5636% (AUC 0.9605). Main115 specialist-only probe 92.7419% (AUC 0.9838); frozen Main115 rule 93.4535%. Simple concatenation does not approach Main115, but complementarity exists: learned z correct on 62.93% of Main115-error rows (LR) and 64.81% (SVM). Retire this fusion configuration; test strongest Exp13/Main133 z + Main115 next.
+28         | [✓]    | 94.2125% | 0.9886 | 93.5484% | Main148/Exp28: exact Main133 z + five Main115 specialist probabilities. LR fused 94.2125% (AUC 0.9886), SVM fused 93.5484% (AUC 0.9799). Main133 z alone 90.7970% LR; Main115 frozen rule 93.4535%. Strict z reconstruction passed (max diff 1.91e-6). Simple fusion is promising, but probes are validation-fitted and not submit-safe; requires strict OOF fusion before any submission.
+29         | [✓]    | 91.8880% | 0.9777 | 91.8880% | Main140/Exp29: Embedding Linear Separability. Main131/Exp11 strongest linear separability (LR 91.7932%, LinearSVM 91.8880%, AUC 0.9777). Main133/Exp13 next (LR 90.7970%, LinearSVM 90.9867%, AUC 0.9695). Validation-fitted probes are diagnostic only, not submit-safe. Main131/Main133 retained for Phase-8 audit.
+30         | [✓]    | N/A      | N/A    | N/A      | Main150/Exp30: Embedding Distance Analysis completed. Pairwise within-class distance, between-class distance, and between/within ratio measured on six retained 128-D representations. Main133 ratio 1.9527; Main145 1.9731; Main144 2.4393; Main139 1.7346; Main146 1.3793; Main131 1.3700. Distance geometry is diagnostic only; no classifier trained and no Kaggle submission.
+31         | [✓]    | 90.8444% | N/A    | 90.8444% | Main151/Exp31: train→validation kNN audit on six retained 128-D representations. Main131 strongest at k=5 (mean purity/vote accuracy 90.8444%); Main139 and Main145 next at 89.2315% and 89.1841%. Main133 reaches 88.8520% at k=5. Main144 is weakest (86.1006% at k=5) with strong class-0 but weak class-1 neighborhood purity. Diagnostic only; no classifier training, tuning, or submission.
+32         | [✓]    | N/A      | N/A    | N/A      | Main152/Exp32: PCA + t-SNE visualization of Main131/Main133 validation embeddings. Main131 first-2-PC variance 64.13%; Main133 98.45%. Both show class-dependent structure with overlap; t-SNE gives clearer nonlinear separation for Main133. UMAP unavailable. Diagnostic only; no classifier/tuning/submission.
+33         | [✓]    | 93.4535% | N/A    | 93.4535% | Main153/Exp33: final Main115 error-overlap audit. Main115 93.4535%; Main131 train-fitted LR 90.2751%; Main133 neural output 89.6110%. Main133 rescues 68/138 Main115 errors (49.28%); Main131 rescues 55/138 (39.86%). Oracle unions: 96.6793% for Main115+Main133 and 96.0626% for Main115+Main131. Complementarity is established, but oracle accuracy is diagnostic only and Exp28's 94.2125% remains validation-fitted, not submit-safe.
+
+
+
+EXPERIMENT 26 RESULT — EXP25 SHARED LATENT + MAIN64 TEACHER DISTILLATION
+=======================================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 146
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Canonical split: train_test_split(test_size=0.20, stratify=y, random_state=42)
+- Architecture inherited from Exp25/Main145:
+  raw tokens + word TF-IDF + transition TF-IDF + structural features
+  → shared 128-D latent vector
+- Max sequence length: 384
+- Vocabulary size: 13,858
+- Word TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Word SVD: 256 components; explained variance 17.4227%
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams,
+  max_features=60,000, sublinear TF
+- Transition SVD: 256 components; explained variance 14.5204%
+- Structural input: 62-D reconstructed compact structural/statistical features
+- Token embedding: 96-D
+- BiGRU hidden: 96-D per direction
+- Latent vector: 128-D
+- Trainable parameters: 1,684,960
+- Objective:
+  BCE + reconstruction + 0.1 × supervised contrastive
+  + 0.15 × Main64 teacher-score regression
+- Contrastive margin: 0.2
+- Batch size: 32
+- Best epoch: 2
+- Runtime: ~45.3 s
+- Main64 teacher: leakage-safe train-only OOF scores for 8,428 training rows
+  plus canonical 2,108 validation scores
+
+Results:
+- Neural validation accuracy: 88.5199%
+- Neural validation AUC: 0.9506
+- SVM on learned z: 88.0455%
+- SVM AUC: 0.9519
+- Logistic Regression on learned z: 88.3302%
+- LR AUC: 0.9523
+- Between-class centroid distance: 6.3162
+- Within-class mean distance: 4.4808
+- Between/within ratio: 1.4096
+
+Training behavior:
+- Epoch 1: val accuracy 86.1480%, AUC 0.9374, val loss 0.7316.
+- Epoch 2: val accuracy 88.5199%, AUC 0.9506, best validation loss 0.6373.
+- Epoch 3: val accuracy 88.2353%, AUC 0.9457, while validation loss increased
+  to 0.8634.
+- Epochs 4–8 continued to show lower training loss but unstable/worse
+  validation loss; early stopping occurred after epoch 8.
+- Teacher RMSE stayed around 0.36, with no corresponding improvement in
+  the learned classification representation.
+
+Comparison with Exp25/Main145:
+- Exp25 neural validation accuracy: 89.0892%.
+- Exp26 neural validation accuracy: 88.5199%.
+- Exp25 neural AUC: 0.9510.
+- Exp26 neural AUC: 0.9506.
+- Exp25 SVM-on-z: 88.5674%.
+- Exp26 SVM-on-z: 88.0455%.
+- Exp25 LR-on-z: 88.4250%.
+- Exp26 LR-on-z: 88.3302%.
+- Exp25 between/within ratio: 2.5216.
+- Exp26 between/within ratio: 1.4096.
+
+Interpretation:
+- Adding frozen Main64 teacher-score distillation did not improve the Exp25
+  representation under this configuration.
+- Neural accuracy decreased by about 0.57 percentage points.
+- SVM-on-z decreased by about 0.52 percentage points.
+- LR-on-z decreased by about 0.09 percentage points, while LR AUC remained
+  0.9523.
+- The geometry ratio dropped substantially from 2.5216 to 1.4096.
+- Therefore this teacher-distillation setup is not a better standalone latent
+  representation than Exp25.
+- This does NOT establish that Main64 information is useless for fusion:
+  teacher outputs may still be complementary when combined through strict OOF
+  predictions instead of being forced into the latent during representation
+  learning.
+
+Decision:
+- Retire Exp26 as a standalone representation-learning approach.
+- Do not spend time tuning the teacher weight during the broad 33-experiment
+  sweep.
+- Retain main146_embeddings.npz and main146_best.pt for possible later
+  strict-OOF fusion/complementarity testing.
+- Proceed to Experiment 27: LEARNED VECTOR + MAIN115 SPECIALIST OUTPUTS.
+
+
+
+EXPERIMENT 27 RESULT — MAIN145 LEARNED VECTOR + MAIN115 SPECIALIST OUTPUTS
+============================================================================
+
+Status: [✓] Completed / [-] Retired for this simple fusion configuration
+
+Configuration:
+- Experiment: Main147 / Exp27
+- Canonical train/validation split: 8,428 / 2,108
+- Learned representation: main145_embeddings.npz
+- z_train shape: 8,428 × 128
+- z_val shape: 2,108 × 128
+- Main115 specialist outputs: 5 probabilities per document
+- Specialists:
+  LR_C1, HGB_small, HGB_medium, RandomForest, ExtraTrees
+- Fused representation: 128-D learned z + 5 Main115 specialist probabilities
+  = 133 dimensions
+- Main115 training probabilities are the strict OOF specialist outputs.
+- Validation probabilities correspond to the canonical validation order.
+- Classifier probes: Logistic Regression and Linear SVM
+- No Kaggle submission.
+
+Results:
+- LR on Main145 z only: 88.9943%, AUC 0.9550
+- LR on Main115 specialist outputs only: 92.7419%, AUC 0.9838
+- LR on fused 133-D representation: 89.3738%, AUC 0.9639
+- SVM on Main145 z only: 88.9469%, AUC 0.9558
+- SVM on Main115 specialist outputs only: 92.7419%, AUC 0.9838
+- SVM on fused 133-D representation: 89.5636%, AUC 0.9605
+- Main115 frozen specialist-consensus rule: 93.4535%
+
+Complementarity diagnostics:
+- Main115 error rows where LR on learned z is correct: 146 / 232 = 62.93%
+- Main115 error rows where SVM on learned z is correct: 151 / 233 = 64.81%
+- LR fused prediction changes versus z-only: 14 rows; 11 changes correct.
+- SVM fused prediction changes versus z-only: 19 rows; 16 changes correct.
+
+Interpretation:
+- The learned Main145 representation contains information that differs from
+  the Main115 specialist outputs: on Main115-error rows, the learned-vector
+  classifier is correct substantially more often than chance.
+- However, simple feature concatenation with LR/SVM does not exploit that
+  complementarity effectively. The fused classifiers remain far below the
+  frozen Main115 rule of 93.4535%.
+- The specialist-output-only probe reaches 92.7419%, confirming that the five
+  Main115 specialist predictions contain strong information, but this probe
+  is still below the frozen Main115 rule.
+- Therefore this experiment does NOT establish that learned representations
+  are non-complementary with Main115. It only shows that Main145 + Main115
+  specialist probabilities are not effective under this simple linear
+  concatenation.
+- Exp13/Main133 remains the strongest learned representation in the broad
+  sweep by LR-on-z accuracy/AUC (90.7970% / 0.9695), so it is the appropriate
+  next candidate for a direct "best learned representation + Main115"
+  complementarity test.
+
+Decision:
+- Retire Main147/Exp27 as a standalone simple-fusion configuration.
+- Do not spend time tuning LR/SVM hyperparameters for this configuration.
+- Retain main147_results.npz and main147_fusion_models.joblib for audit.
+- Do not conclude that learned + Main115 fusion is ineffective in general.
+- Proceed to Main148/Exp27b: Exp13/Main133 learned vector + Main115 specialist
+  outputs using the same alignment-safe fusion methodology.
+
+EXPERIMENT 28 RESULT — MAIN133 LEARNED VECTOR + MAIN115 SPECIALIST OUTPUTS
+===============================================================================
+
+Status: [✓] Completed / promising; validation-fitted fusion is NOT submit-safe
+
+Configuration:
+- Experiment: Main148 / Exp28
+- Canonical train/validation split: 8,428 / 2,108
+- Learned representation: exact Main133 / Exp13 latent z, 128-D
+- Main133 vocabulary/checkpoint artifacts reused directly from main133_best.pt
+- Main115 specialist outputs: 5 probabilities per document
+- Specialists:
+  LR_C1, HGB_small, HGB_medium, RandomForest, ExtraTrees
+- Fused representation: 128-D Main133 z + 5 Main115 specialist probabilities
+  = 133 dimensions
+- Main115 OOF/VAL arrays were verified against the canonical split.
+- No Kaggle submission.
+
+Strict Main133 reconstruction:
+- Checkpoint embedding rows: 14,002
+- Saved vocabulary entries: 14,000
+- Main133 z_val max absolute reconstruction error: 1.9073e-6
+- Main133 z_val mean absolute reconstruction error: 6.4118e-8
+- Safety tolerance: 1e-5
+- Result: PASS. The saved Main133 validation latent was reconstructed
+  within the strict tolerance.
+
+Results:
+- LR on Main133 z only: 90.7970%, AUC 0.9695
+- LR on Main115 specialist outputs only: 93.1689%, AUC 0.9840
+- LR on fused 133-D representation: 94.2125%, AUC 0.9886
+- SVM on Main133 z only: 89.5636%, AUC 0.9450
+- SVM on Main115 specialist outputs only: 93.9279%, AUC 0.9586
+- SVM on fused 133-D representation: 93.5484%, AUC 0.9799
+- Main115 specialist mean: 93.0740%, AUC 0.9841
+- Main115 frozen specialist-consensus rule: 93.4535%
+
+Complementarity diagnostics:
+- Main115 specialist mean was wrong on 146 validation rows.
+- Main133 LR was correct on 77 / 146 = 52.74% of those rows.
+- Main133 SVM was correct on 84 / 146 = 57.53% of those rows.
+- This indicates that Main133 contains information that differs from Main115,
+  although the complementarity signal is weaker than in the earlier Main145
+  diagnostic under its corresponding setup.
+
+Interpretation:
+- This is a materially stronger result than Main147/Exp27.
+- The LR fused validation accuracy of 94.2125% exceeds the Main115 frozen
+  validation reference of 93.4535% by 0.759 percentage points.
+- The fused LR AUC of 0.9886 is also substantially higher than either
+  Main133-z alone (0.9695) or Main115 specialist mean (0.9841).
+- SVM fusion also reaches 93.5484%, slightly above the Main115 frozen rule.
+- Therefore Main133 + Main115 is clearly promising as a fusion direction.
+- However, these LR/SVM probes were fit directly on the same validation
+  examples on which they were evaluated. They are diagnostic only and cannot
+  be treated as submit-safe validation estimates.
+- The important next step is therefore NOT to submit this 94.21% result.
+  We need a strict OOF training procedure for the fusion model, with
+  train-side Main133 embeddings/predictions and Main115 OOF outputs, followed
+  by a single untouched canonical validation evaluation.
+- Do not weaken the Main133 reconstruction tolerance or infer performance
+  from the validation-fitted probe.
+
+Decision:
+- Retain Main133 embeddings/checkpoint and Main115 specialist outputs.
+- Promote Main133 + Main115 to the strongest fusion candidate so far,
+  subject to strict OOF validation.
+- Do not tune LR/SVM repeatedly on the same validation set.
+- Proceed to a strict-OOF implementation of this fusion before considering
+  any Kaggle submission.
+
+Next experiment:
+Main149 — STRICT OOF MAIN133 REPRESENTATION + MAIN115 SPECIALIST FUSION
+
+
+EXPERIMENT 29 RESULT — EMBEDDING LINEAR SEPARABILITY
+=====================================================
+
+Status: [✓] Completed / diagnostic Phase-8 audit
+
+Configuration:
+- Experiment: Main140 / Exp29
+- Canonical split: train_test_split(test_size=0.20, stratify=y, random_state=42)
+- Validation size: 2,108
+- Validation class counts: 740 / 1,368
+- Candidates audited: Main133 / Exp13, Main131 / Exp11, Main145 / Exp25,
+  Main146 / Exp26, Main144 / Exp24, Main139 / Exp19
+- Each candidate uses its saved 128-D validation embedding z.
+- Diagnostic probes: Logistic Regression, RBF SVM, and Linear SVM.
+- Also measured between-class centroid distance, within-class mean radius,
+  and the between/within ratio.
+- No Kaggle submission.
+
+Important evaluation caveat:
+- The probes were fit directly on the canonical validation embeddings and
+  evaluated on those same validation examples.
+- Therefore these numbers are representation separability diagnostics, not
+  submit-safe generalization estimates.
+- Do not treat these probe accuracies as independent validation performance
+  or use repeated validation fitting for final fusion/model selection.
+
+Results:
+
+Main133 / Exp13:
+- LR accuracy: 90.7970%, AUC: 0.9695
+- Linear SVM accuracy: 90.9867%, AUC: 0.9707
+- RBF SVM accuracy: 89.4213%, AUC: 0.9514
+- Between-class distance: 23.1165
+- Within-class mean radius: 8.7200
+- Between/within ratio: 2.6510
+
+Main131 / Exp11:
+- LR accuracy: 91.7932%, AUC: 0.9777
+- Linear SVM accuracy: 91.8880%, AUC: 0.9768
+- RBF SVM accuracy: 90.7495%, AUC: 0.9693
+- Between-class distance: 6.9470
+- Within-class mean radius: 5.2156
+- Between/within ratio: 1.3320
+
+Main145 / Exp25:
+- LR accuracy: 89.0892%, AUC: 0.9544
+- Linear SVM accuracy: 88.4250%, AUC: 0.9526
+- RBF SVM accuracy: 88.4250%, AUC: 0.9370
+- Between-class distance: 0.8901
+- Within-class mean radius: 0.3530
+- Between/within ratio: 2.5216
+
+Main146 / Exp26:
+- LR accuracy: 88.6148%, AUC: 0.9582
+- Linear SVM accuracy: 88.8046%, AUC: 0.9597
+- RBF SVM accuracy: 88.0930%, AUC: 0.9526
+- Between-class distance: 6.3162
+- Within-class mean radius: 4.4808
+- Between/within ratio: 1.4096
+
+Main144 / Exp24:
+- LR accuracy: 88.8994%, AUC: 0.9598
+- Linear SVM accuracy: 88.5199%, AUC: 0.9590
+- RBF SVM accuracy: 88.1879%, AUC: 0.9374
+- Between-class distance: 1.3791
+- Within-class mean radius: 0.4310
+- Between/within ratio: 3.1995
+
+Main139 / Exp19:
+- LR accuracy: 89.6584%, AUC: 0.9662
+- Linear SVM accuracy: 89.3738%, AUC: 0.9673
+- RBF SVM accuracy: 88.2827%, AUC: 0.9538
+- Between-class distance: 27.1130
+- Within-class mean radius: 11.9778
+- Between/within ratio: 2.2636
+
+Interpretation:
+- Main131 / Exp11 has the strongest linear separability among the audited
+  representations: Linear SVM 91.8880% and LR 91.7932%, with AUC around 0.977.
+- Main133 / Exp13 is the next strongest by linear separability, with Linear
+  SVM 90.9867%, LR 90.7970%, and AUC around 0.970.
+- Main133 has a stronger between/within ratio (2.6510) than Main131 (1.3320),
+  showing that the geometry ratio and linear classification do not rank
+  representations identically.
+- Main144 has the highest between/within ratio (3.1995), but weaker linear
+  separability, so the ratio alone is not sufficient to identify the strongest
+  representation.
+- Main145, Main146, and Main139 remain weaker than Main131/Main133 on linear
+  separability, although they contain measurable class-related signal.
+- Main131 and Main133 remain the strongest representations for the remaining
+  Phase-8 audit.
+- This audit does not replace the strict-OOF requirement for learned-vector +
+  Main115 fusion. Main133 + Main115 remains the fusion direction to validate
+  strictly OOF before any submission.
+
+Decision:
+- Mark Exp29 complete.
+- No new standalone neural model is promoted from this audit.
+- Keep Main131 and Main133 as the two strongest representations for the
+  remaining Phase-8 analysis.
+- Proceed to Experiment 30: EMBEDDING DISTANCE ANALYSIS.
+- Preserve the strict-OOF requirement for any learned-vector + Main115 fusion.
+- No Kaggle submission.
+
+
+EXPERIMENT 30 RESULT — EMBEDDING DISTANCE ANALYSIS
+==================================================
+
+Status: [✓] Completed / diagnostic Phase-8 audit
+
+Configuration:
+- Experiment: Main150 / Exp30
+- Canonical split: train_test_split(test_size=0.20, stratify=y, random_state=42)
+- Validation size: 2,108
+- Validation class counts: 740 / 1,368
+- Candidates audited: Main131 / Exp11, Main133 / Exp13, Main145 / Exp25,
+  Main139 / Exp19, Main144 / Exp24, Main146 / Exp26
+- Each candidate uses its saved 128-D validation embedding z.
+- Distance analysis:
+  pairwise mean within-class Euclidean distance,
+  mean between-class Euclidean distance,
+  and between/within ratio.
+- Also measured class-specific within-class distances and
+  between-class centroid distance.
+- No classifier was trained.
+- No validation-fitted transformation was applied.
+- No Kaggle submission.
+
+Important metric-definition caveat:
+- Exp30 uses mean pairwise Euclidean distance within each class.
+- The earlier Exp29 audit reported "within-class mean radius", i.e. distance
+  to the class centroid.
+- Therefore the Exp30 within-distance values and between/within ratios should
+  NOT be numerically compared directly with the Exp29 ratios.
+- Exp30 is internally comparable across the six representations because the
+  same distance definition is used for every candidate.
+
+Results:
+
+Main131 / Exp11:
+- Class-0 within-class mean distance: 6.0417
+- Class-1 within-class mean distance: 8.6768
+- Mean within-class distance: 7.3593
+- Between-class mean distance: 10.0825
+- Between-class centroid distance: 6.9470
+- Between/within ratio: 1.3700
+
+Main133 / Exp13:
+- Class-0 within-class mean distance: 6.4535
+- Class-1 within-class mean distance: 18.0741
+- Mean within-class distance: 12.2638
+- Between-class mean distance: 23.9474
+- Between-class centroid distance: 23.1165
+- Between/within ratio: 1.9527
+
+Main145 / Exp25:
+- Class-0 within-class mean distance: 0.5183
+- Class-1 within-class mean distance: 0.5109
+- Mean within-class distance: 0.5146
+- Between-class mean distance: 1.0153
+- Between-class centroid distance: 0.8901
+- Between/within ratio: 1.9731
+
+Main139 / Exp19:
+- Class-0 within-class mean distance: 6.2497
+- Class-1 within-class mean distance: 27.2287
+- Mean within-class distance: 16.7392
+- Between-class mean distance: 29.0360
+- Between-class centroid distance: 27.1130
+- Between/within ratio: 1.7346
+
+Main144 / Exp24:
+- Class-0 within-class mean distance: 0.5094
+- Class-1 within-class mean distance: 0.6979
+- Mean within-class distance: 0.6036
+- Between-class mean distance: 1.4725
+- Between-class centroid distance: 1.3791
+- Between/within ratio: 2.4393
+
+Main146 / Exp26:
+- Class-0 within-class mean distance: 5.7619
+- Class-1 within-class mean distance: 7.0621
+- Mean within-class distance: 6.4120
+- Between-class mean distance: 8.8438
+- Between-class centroid distance: 6.3162
+- Between/within ratio: 1.3793
+
+Interpretation:
+- Main144 / Exp24 has the highest pairwise between/within ratio in this
+  Exp30 audit at 2.4393, followed by Main145 / Exp25 at 1.9731 and
+  Main133 / Exp13 at 1.9527.
+- Main133 has substantial absolute class separation: its between-class mean
+  distance is 23.9474 versus 12.2638 mean within-class distance.
+- Main133 also shows a large class-1 spread (18.0741) relative to class 0
+  (6.4535). Thus its separation is accompanied by substantial within-class
+  heterogeneity, rather than both classes forming equally compact clusters.
+- Main145 has almost identical within-class spreads for the two classes
+  (0.5183 vs 0.5109) and a ratio of 1.9731, indicating comparatively balanced
+  latent geometry.
+- Main144 has a strong geometric ratio of 2.4393, but its earlier Exp29
+  linear separability was weaker than Main131/Main133. This again shows that
+  a high distance ratio alone is not sufficient to identify the most useful
+  representation for classification.
+- Main131 has the lowest pairwise between/within ratio among the six at 1.3700,
+  yet Exp29 showed that it had the strongest linear separability. This provides
+  another direct example that distance geometry and classification performance
+  need not rank representations identically.
+- Main146 is similar to Main131 in this audit, with a ratio of 1.3793 and
+  relatively compact class spreads, but it did not match Main131/Main133 in
+  linear separability.
+- Main139 has substantial between-class distance (29.0360) but also very large
+  within-class dispersion, especially for class 1 (27.2287), reducing its
+  ratio to 1.7346.
+- Overall, Exp30 confirms that the learned representations contain measurable
+  class-dependent geometry, but no single distance statistic is sufficient to
+  replace the linear-separability and strict-OOF complementarity tests.
+
+Decision:
+- Mark Exp30 complete.
+- No new standalone neural model is promoted from this audit.
+- Keep Main131 and Main133 as the primary representations for the remaining
+  Phase-8 audit, consistent with Exp29.
+- Main145/Main144/Main139/Main146 remain retained only where useful for
+  complementarity or supporting geometry analysis.
+- Proceed to Experiment 31: EMBEDDING NEAREST-NEIGHBOR ANALYSIS.
+- Preserve the strict-OOF requirement for any learned-vector + Main115 fusion.
+- No Kaggle submission.
+
+Next experiment to run:
+Experiment 31 — EMBEDDING NEAREST-NEIGHBOR ANALYSIS
+(Main151: measure kNN class consistency in the learned latent spaces.)
+
+
+EXPERIMENT 31 RESULT — EMBEDDING NEAREST-NEIGHBOR ANALYSIS
+============================================================
+
+Status: [✓] Completed / diagnostic Phase-8 audit
+
+Configuration:
+- Experiment: Main151 / Exp31
+- Canonical split: train_test_split(test_size=0.20, stratify=y, random_state=42)
+- Training reference rows: 8,428
+- Validation query rows: 2,108
+- Train label counts: 2,959 / 5,469
+- Validation label counts: 740 / 1,368
+- Candidates audited: Main131 / Exp11, Main133 / Exp13, Main145 / Exp25,
+  Main139 / Exp19, Main144 / Exp24, Main146 / Exp26
+- All representations are 128-D learned latent vectors.
+- k values: 1, 3, 5, 10, 20
+- Distance metric: Euclidean
+- kNN reference set: training embeddings only
+- Query set: canonical validation embeddings
+- Validation labels were used only to evaluate neighbor purity and majority-vote accuracy.
+- No classifier was trained.
+- No hyperparameter tuning was performed.
+- No Kaggle submission.
+
+Main133 reconstruction safety:
+- Main133 training embedding was reconstructed from the saved Main133 checkpoint
+  without retraining.
+- Main133 validation reconstruction max absolute difference: 4.7684e-6
+- Main133 validation reconstruction mean absolute difference: 2.6093e-7
+- Safety tolerance: 1e-5
+- Result: PASS. The exact saved Main133 validation representation was
+  reconstructed within the strict tolerance.
+
+Results:
+
+Main131 / Exp11:
+- k=1: mean purity 90.0380%, vote accuracy 90.0380%
+- k=3: mean purity 90.0696%, vote accuracy 90.7970%
+- k=5: mean purity 90.0854%, vote accuracy 90.8444%
+- k=10: mean purity 89.7723%, vote accuracy 90.5598%
+- k=20: mean purity 89.2481%, vote accuracy 90.0380%
+- Best k by vote accuracy: k=5, 90.8444%
+- At k=5: class-0 purity 91.6486%, class-1 purity 89.2398%
+
+Main133 / Exp13:
+- k=1: mean purity 87.8558%, vote accuracy 87.8558%
+- k=3: mean purity 87.7925%, vote accuracy 88.4250%
+- k=5: mean purity 87.6091%, vote accuracy 88.8520%
+- k=10: mean purity 87.7467%, vote accuracy 88.7097%
+- k=20: mean purity 87.5664%, vote accuracy 88.5674%
+- Best k by vote accuracy: k=5, 88.8520%
+- At k=5: class-0 purity 90.2162%, class-1 purity 86.1988%
+
+Main145 / Exp25:
+- k=1: mean purity 88.5199%, vote accuracy 88.5199%
+- k=3: mean purity 88.8994%, vote accuracy 89.1841%
+- k=5: mean purity 88.8330%, vote accuracy 89.1841%
+- k=10: mean purity 88.6290%, vote accuracy 88.8994%
+- k=20: mean purity 88.4156%, vote accuracy 88.8994%
+- Best k by vote accuracy: k=3/k=5, 89.1841%
+- At k=5: class-0 purity 90.2703%, class-1 purity 88.0556%
+
+Main139 / Exp19:
+- k=1: mean purity 89.1366%, vote accuracy 89.1366%
+- k=3: mean purity 88.5357%, vote accuracy 89.2315%
+- k=5: mean purity 88.5009%, vote accuracy 89.2315%
+- k=10: mean purity 88.3586%, vote accuracy 89.1841%
+- k=20: mean purity 88.2543%, vote accuracy 89.1366%
+- Best k by vote accuracy: k=3/k=5, 89.2315%
+- At k=5: class-0 purity 89.8649%, class-1 purity 87.7632%
+
+Main144 / Exp24:
+- k=1: mean purity 85.9583%, vote accuracy 85.9583%
+- k=3: mean purity 85.9899%, vote accuracy 85.9108%
+- k=5: mean purity 85.8824%, vote accuracy 86.1006%
+- k=10: mean purity 85.6641%, vote accuracy 85.6262%
+- k=20: mean purity 85.6641%, vote accuracy 85.7211%
+- Best k by vote accuracy: k=5, 86.1006%
+- At k=5: class-0 purity 96.7838%, class-1 purity 79.9854%
+
+Main146 / Exp26:
+- k=1: mean purity 86.1954%, vote accuracy 86.1954%
+- k=3: mean purity 86.2113%, vote accuracy 87.3340%
+- k=5: mean purity 86.2524%, vote accuracy 88.1404%
+- k=10: mean purity 86.0674%, vote accuracy 87.9981%
+- k=20: mean purity 85.9796%, vote accuracy 87.8558%
+- Best k by vote accuracy: k=5, 88.1404%
+- At k=5: class-0 purity 83.7027%, class-1 purity 87.6316%
+
+Interpretation:
+- Main131 / Exp11 has the strongest local neighborhood consistency in this
+  audit. Its best kNN vote accuracy is 90.8444% at k=5, closely matching its
+  strong linear separability from Exp29.
+- Main139 / Exp19 and Main145 / Exp25 follow with best vote accuracies of
+  89.2315% and 89.1841%, respectively. Their neighborhood structure is
+  therefore meaningful, but weaker than Main131.
+- Main133 / Exp13 reaches 88.8520% at k=5. This confirms that Main133 has
+  useful local class structure, but its kNN consistency is below Main131.
+  This is consistent with Exp29, where Main133 was also below Main131 on
+  direct linear separability.
+- Main144 / Exp24 has the weakest kNN vote accuracy, 86.1006% at k=5,
+  despite having the strongest pairwise distance ratio in Exp30. This is
+  another concrete example that global distance geometry does not directly
+  determine local classification quality.
+- Main144 shows a strong class asymmetry: at k=5, class-0 neighborhood purity
+  is 96.7838% while class-1 purity is only 79.9854%. The representation
+  therefore produces locally very clean class-0 neighborhoods but substantially
+  more mixed class-1 neighborhoods.
+- Main146 shows the opposite tendency: at k=5, class-0 purity is 83.7027%
+  and class-1 purity is 87.6316%. Its local structure is therefore somewhat
+  more favorable for class 1 than class 0.
+- Main133 also shows a class asymmetry at k=5, with class-0 purity 90.2162%
+  versus class-1 purity 86.1988%.
+- For Main131, the best neighborhood scale is around k=5. Increasing k beyond
+  5 reduces mean purity and vote accuracy, indicating that larger
+  neighborhoods begin mixing the classes more strongly.
+- The same general pattern appears across most representations: k=3–5 is
+  more useful than very large neighborhoods, while k=20 generally gives
+  lower local purity/accuracy.
+- Mean neighbor purity and majority-vote accuracy are not identical for
+  k>1. Purity measures the fraction of same-class neighbors, while vote
+  accuracy measures whether the majority class of the neighborhood matches
+  the query label.
+- The kNN results are diagnostic rather than submit-safe model estimates.
+  They do not by themselves establish that a kNN classifier or local-distance
+  feature will improve Main115, because no OOF-trained fusion/model was
+  performed here.
+- The results reinforce Main131 and Main133 as the main representations for
+  the remaining Phase-8 audit. Main145/Main139 remain interesting only where
+  complementary information is demonstrated under strict OOF testing.
+
+Decision:
+- Mark Exp31 complete.
+- Do not promote a standalone kNN classifier from this diagnostic.
+- Keep Main131 and Main133 as the primary learned representations for the
+  remaining Phase-8 audit.
+- Do not infer submission performance from the kNN diagnostic.
+- Preserve the strict-OOF requirement for any learned-vector + Main115 fusion.
+- Proceed to Experiment 32: EMBEDDING VISUALIZATION.
+- No Kaggle submission.
+
+Next experiment to run:
+Experiment 32 — EMBEDDING VISUALIZATION
+(Main152: PCA / UMAP / t-SNE visualization of the strongest learned
+representations, especially Main131 and Main133.)
+
+
+EXPERIMENT 32 RESULT — EMBEDDING VISUALIZATION
+================================================
+
+Status: [✓] Completed / diagnostic Phase-8 audit
+
+Configuration:
+- Experiment: Main152 / Exp32
+- Canonical split: train_test_split(test_size=0.20, stratify=y, random_state=42)
+- Training rows: 8,428
+- Validation rows visualized: 2,108
+- Validation class counts: 740 / 1,368
+- Primary representations: Main131 / Exp11 and Main133 / Exp13
+- Latent dimension: 128-D for both representations
+- Visualization methods:
+  PCA and t-SNE
+- UMAP:
+  skipped because umap-learn was not installed in the project environment.
+- PCA:
+  unsupervised; class labels were not used during dimensionality reduction.
+- t-SNE:
+  perplexity=30, max_iter=1000, init=PCA, learning_rate=auto.
+- Class labels were used only to color/identify points after reduction.
+- No classifier was trained.
+- No hyperparameter tuning was performed.
+- No Kaggle submission.
+
+Main133 reconstruction safety:
+- TF-IDF IDF maximum absolute reconstruction difference: 0.0
+- Main133 z_val maximum absolute reconstruction difference: 4.7684e-6
+- Main133 z_val mean absolute reconstruction difference: 2.6093e-7
+- Safety tolerance: 1e-5
+- Result: PASS. The exact saved Main133 validation representation was
+  reconstructed within the strict tolerance before visualization.
+
+PCA results:
+
+Main131 / Exp11:
+- PC1 explained variance ratio: 37.9860%
+- PC2 explained variance ratio: 26.1480%
+- Total variance explained by first two PCs: 64.1339%
+
+Main133 / Exp13:
+- PC1 explained variance ratio: 96.4853%
+- PC2 explained variance ratio: 1.9618%
+- Total variance explained by first two PCs: 98.4471%
+
+Visual interpretation:
+
+Main131 / Exp11:
+- The PCA plot shows a clear class-dependent trend: Class A is concentrated
+  more strongly toward the negative-PC1 side, while Class B extends much more
+  strongly toward positive PC1.
+- There is nevertheless substantial overlap in the central region, so the
+  PCA projection does not produce two completely separated clusters.
+- The t-SNE plot shows several locally coherent regions for both classes, but
+  also substantial interleaving in the central parts of the embedding.
+- This is consistent with Exp29 and Exp31: Main131 has strong but imperfect
+  linear and local separability rather than a perfectly separated latent space.
+
+Main133 / Exp13:
+- The PCA plot is dominated by PC1: the first component alone explains
+  96.4853% of the validation variance, and the first two explain 98.4471%.
+- The two classes occupy noticeably different regions of this projection,
+  although they overlap substantially around the central/negative-PC1
+  region.
+- The t-SNE plot shows a much more visually distinct nonlinear organization:
+  large regions are predominantly Class A or Class B, with a mixed transition
+  region between them.
+- The t-SNE visualization therefore supports the existence of nonlinear/local
+  class structure in Main133, but it should not be interpreted as a calibrated
+  classifier or quantitative accuracy estimate.
+
+Cross-experiment interpretation:
+- The visualization confirms that both Main131 and Main133 contain
+  meaningful class-dependent structure in their latent spaces.
+- Main131 remains the stronger representation by the quantitative Phase-8
+  audits: it had the strongest linear separability in Exp29 and the strongest
+  train-to-validation kNN consistency in Exp31.
+- Main133 has particularly concentrated low-dimensional variance: 98.4471% is
+  captured by its first two PCA components. This means its 128-D latent space
+  is highly anisotropic/redundant, with most validation variance lying along
+  a small number of directions.
+- A high PCA variance concentration does NOT by itself mean better
+  classification. Exp29/30/31 already showed that distance geometry,
+  linear separability, and local neighborhood quality can rank
+  representations differently.
+- The visualizations also do not establish that t-SNE-separated regions
+  will generalize to unseen test data, because t-SNE is a visualization
+  method rather than a predictive model.
+- No representation is promoted or retired solely from the plots.
+
+Decision:
+- Mark Exp32 complete.
+- Do not promote PCA or t-SNE as standalone classifiers.
+- Keep Main131 as the strongest learned representation by the quantitative
+  Phase-8 diagnostics.
+- Keep Main133 as the strongest learned representation for the previously
+  identified Main115 fusion direction, subject to strict OOF validation.
+- Do not use the visual separation to claim submit-safe performance.
+- No further tuning of PCA/t-SNE/UMAP is required for the 33-experiment sweep.
+- Proceed to Experiment 33: FINAL COMPARISON AGAINST MAIN115.
+- Preserve the strict-OOF requirement for any learned-vector + Main115 fusion.
+- No Kaggle submission.
+
+
+EXPERIMENT 33 RESULT — FINAL COMPARISON / ERROR-OVERLAP AUDIT AGAINST MAIN115
+============================================================================
+
+Status: [✓] Completed / final Phase-8 audit
+
+Purpose:
+- Exp28 already showed a 94.2125% Main133 + Main115 LR fusion on the
+  validation set, but that fusion was validation-fitted and therefore was
+  not submit-safe.
+- Exp33 therefore does not train another validation-fitted fusion model.
+- Instead it measures standalone performance and error complementarity between
+  the frozen Main115 rule and the strongest retained learned representations.
+- It also reports the hypothetical oracle-union accuracy as a diagnostic
+  upper bound. The oracle is NOT a usable classifier because it assumes
+  knowledge of which prediction is correct.
+
+Alignment / safety:
+- Validation rows: 2,108.
+- Main115 did not store val_indices, so the canonical validation order was
+  reconstructed from train.json using:
+    train_test_split(
+        all_idx,
+        test_size=0.20,
+        stratify=y,
+        random_state=42
+    )
+- Main115 y_val exactly matched the reconstructed canonical validation labels.
+- Main131 and Main133 validation indices were checked against the canonical
+  validation order.
+- No selector was trained.
+- No new fusion model was trained.
+- No hyperparameter tuning was performed.
+- No Kaggle submission.
+
+Standalone comparison:
+
+Main115 frozen rule:
+- Accuracy: 93.4535%
+- Correct: 1,970 / 2,108
+- Wrong: 138 / 2,108
+
+Main131 / Exp11:
+- Train-fitted LR on the saved 128-D z_train representation, evaluated on
+  z_val.
+- Accuracy: 90.2751%
+- AUC: 0.9663654
+- Correct: 1,903 / 2,108
+- Wrong: 205 / 2,108
+- Accuracy delta vs Main115: -3.1784 percentage points.
+
+Main133 / Exp13:
+- Saved trained neural-model validation probability used for this final
+  standalone comparison.
+- Accuracy: 89.6110%
+- AUC: 0.9577950
+- Correct: 1,889 / 2,108
+- Wrong: 219 / 2,108
+- Accuracy delta vs Main115: -3.8425 percentage points.
+
+IMPORTANT INTERPRETATION:
+- The standalone learned representations do NOT replace Main115 on this
+  validation set.
+- This does not mean the representations are useless: Exp33 is primarily
+  measuring whether their errors differ from Main115's errors.
+
+Main115 vs Main131:
+- Both correct: 1,848
+- Both wrong: 83
+- Disagreements: 177
+- Main131 correct on Main115's 138 errors: 55
+- Main131 rescue fraction of Main115 errors: 39.86%
+- Main115 correct on Main131's 205 errors: 122
+- Main115 rescue fraction of Main131 errors: 59.51%
+- Hypothetical oracle union accuracy: 96.0626%
+
+Interpretation:
+- Main131 contains substantial information not captured by Main115:
+  it independently corrects 55 of Main115's 138 validation errors.
+- The 96.0626% oracle union is evidence of complementary error sets, NOT a
+  deployable accuracy estimate.
+
+Main115 vs Main133:
+- Both correct: 1,821
+- Both wrong: 70
+- Disagreements: 217
+- Main133 correct on Main115's 138 errors: 68
+- Main133 rescue fraction of Main115 errors: 49.28%
+- Main115 correct on Main133's 219 errors: 149
+- Main115 rescue fraction of Main133 errors: 68.04%
+- Hypothetical oracle union accuracy: 96.6793%
+
+Interpretation:
+- Main133 shows stronger error complementarity with Main115 than Main131
+  in this audit.
+- Main133 independently corrects nearly half of Main115's errors.
+- This is consistent with Exp28's observation that Main133 can add useful
+  information to Main115.
+- However, the 96.6793% oracle union is not achievable simply by selecting
+  the correct model after seeing the label; it is only a diagnostic upper
+  bound.
+- A real selector/fusion model must be evaluated with strict out-of-fold
+  predictions to establish generalization.
+
+Main131 vs Main133:
+- Both correct: 1,795
+- Both wrong: 111
+- Disagreements: 202
+- Main133 correct on Main131's 205 errors: 94
+- Main133 rescue fraction of Main131 errors: 45.85%
+- Main131 correct on Main133's 219 errors: 108
+- Main131 rescue fraction of Main133 errors: 49.32%
+- Hypothetical oracle union accuracy: 94.7343%
+
+Interpretation:
+- Main131 and Main133 are genuinely different representations rather than
+  producing nearly identical decisions.
+- Each rescues a substantial fraction of the other's errors.
+- This supports retaining both as distinct learned representations for
+  possible future OOF ensemble research, but not selecting either as a
+  standalone replacement for Main115.
+
+Final Phase-8 conclusion:
+- Main115 remains the strongest validated classical reference at 93.4535%
+  local validation accuracy.
+- Main131 is the strongest learned representation by the earlier quantitative
+  audits: linear separability and kNN consistency.
+- Main133 is the most interesting learned representation for complementarity
+  with Main115: Exp33 shows 68/138 Main115 errors are correctly handled by
+  Main133, and Exp28's validation-fitted fusion reached 94.2125%.
+- The 94.2125% Exp28 result must NOT be presented as submit-safe because the
+  fusion was fitted on the same validation examples used for evaluation.
+- Main149 attempted strict OOF fusion but failed its exact Main133 validation
+  reconstruction safety check, so it cannot validate the 94.2125% result.
+- Therefore no new fusion claim should be made from the current local
+  validation set without a successful strict-OOF procedure.
+- Exp33 is complete. The planned 33-experiment neural representation audit
+  is now complete.
+
+Project-level note:
+- Main79 remains the current best submittable Kaggle model at 95.00% public.
+- Main115 is the strongest local-validation reference for the representation
+  study.
+- Main131/Main133 should be described as complementary learned representations,
+  not standalone replacements for Main115.
+- Do not weaken the strict OOF reconstruction tolerance merely to obtain a
+  fusion result.
+
+EXPERIMENT 19 RESULT — BEST MODEL + CROSS-ENTROPY + CONTRASTIVE LOSS
+==========================================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 139
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Vocabulary size: 18,438
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- SVD components: 256
+- SVD explained variance ratio: 0.1743
+- Structural input: 62 compact structural/statistical features
+- Token embedding: 96-D
+- BiGRU hidden: 96-D per direction
+- Branch dimension: 128
+- Fusion hidden: 256
+- Learned latent vector: 128-D
+- Trainable parameters: 2,136,705
+- Objective: BCEWithLogitsLoss + 0.1 × supervised pairwise contrastive loss
+- Contrastive margin: 0.2
+- Batch size: 64
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Best epoch: 3
+- Runtime: ~71.8 s
+
+Results:
+- Neural validation accuracy: 88.7097%
+- Neural validation AUC: 0.9600
+- SVM on learned z: 88.2827%
+- SVM AUC: 0.9583
+- Logistic Regression on learned z: 88.5674%
+- LR AUC: 0.9599
+- Between-class centroid distance: 27.1130
+- Within-class centroid distance: 11.9778
+- Between/within ratio: 2.2636
+
+Training behavior:
+- Epoch 1: train acc 80.41%, val acc 87.38%, AUC 0.9498.
+- Epoch 2: train acc 89.90%, val acc 86.43%, AUC 0.9577.
+- Epoch 3: train acc 93.37%, val acc 88.71%, AUC 0.9600; best validation loss.
+- Epoch 4: train acc 95.68%, val acc 88.38%, AUC 0.9577.
+- Epoch 5 onward: training accuracy continued toward 99.5% while
+  validation loss deteriorated substantially.
+- Early stopping occurred after epoch 10.
+
+Interpretation:
+- Adding supervised pairwise contrastive loss to the BCE objective did not
+  improve the best Phase-3 representation. The neural accuracy of 88.7097%
+  is below Exp13/Main133's 89.6110%, while LR-on-z reaches only 88.5674%
+  versus Exp13's 90.7970%.
+- The latent AUC of 0.9600 is strong and confirms that the representation
+  contains substantial class-ranking information, but it is not superior
+  to the strongest earlier representation. Exp13/Main133 reached LR-on-z
+  AUC 0.9695.
+- The between/within ratio of 2.2636 is also lower than Exp13/Main133's
+  2.6510. This reinforces the earlier observation that larger centroid
+  separation does not automatically produce a better classification
+  boundary.
+- Compared with Exp18 (BCE-only), Exp19 improves the neural validation
+  accuracy (88.7097% vs 86.2903%) and neural AUC (0.9600 vs 0.9540), but
+  still remains below Exp13/Main133. LR-on-z also improves over Exp18
+  (88.5674% vs 87.8558%) but does not approach Exp13/Main133.
+- The train/validation behavior shows clear overfitting after the selected
+  epoch: training accuracy keeps rising while validation loss deteriorates.
+  Therefore the contrastive term did not solve the generalization problem.
+
+Decision:
+- Retire Exp19 as a standalone classifier.
+- Do not spend time hyperparameter-tuning the contrastive weight or margin
+  during the broad 33-experiment sweep.
+- Retain main139_embeddings.npz and main139_best.pt for possible later
+  complementary strict-OOF fusion.
+- Proceed to Experiment 20: BEST MODEL + SUPERVISED CONTRASTIVE LEARNING.
+
+EXPERIMENT 1 RESULT — RAW TOKENS → CNN
+======================================
+
+Status: [✓] Completed / [-] Retired
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token embedding: 128-D
+- CNN channels: 128
+- Kernels: 3, 5, 7, 9
+- Learned latent vector: 128-D
+- Trainable parameters: 3,057,537
+
+Results:
+- Neural CNN validation accuracy: 77.0873%
+- Neural CNN validation AUC: 0.8414
+- SVM on learned z: 78.0361%
+- SVM AUC: 0.8450
+- Logistic Regression on learned z: 77.4668%
+- LR AUC: 0.8455
+- Between-class centroid distance: 0.6916
+- Within-class mean distance: 0.5409
+- Between/within ratio: 1.2787
+- Training time: ~0.63 min
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The raw-token CNN learned a weak representation for this task. The learned
+128-D vector is far below the current classical reference, and SVM/LR on the
+vector do not recover the performance. The CNN branch is therefore retired
+without hyperparameter tuning. Its learned embeddings were saved for record
+keeping but are not promoted to later fusion experiments.
+
+EXPERIMENT 2 RESULT — RAW TOKENS → BiGRU
+========================================
+
+Status: [✓] Completed / [-] Retired
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token embedding: 128-D
+- BiGRU hidden: 128-D per direction
+- Learned latent vector: 128-D
+- Layers: 1
+- Dropout: 0.2
+- Batch size: 64
+- Trainable parameters: 2,624,385
+- Best epoch: 2
+
+Results:
+- Neural BiGRU validation accuracy: 79.0797%
+- Neural BiGRU validation AUC: 0.8835
+- SVM on learned z: 81.0247%
+- SVM AUC: 0.8817
+- Logistic Regression on learned z: 81.0247%
+- LR AUC: 0.8819
+- Between-class centroid distance: 4.9383
+- Within-class mean distance: 7.4518
+- Between/within ratio: 0.6627
+- Training + evaluation time: ~1.17 min
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The raw-token BiGRU learned a weak latent representation for this task.
+Although its AUC (0.8835 neural, ~0.8818 with SVM/LR) shows that the
+representation contains some class-related information, its validation
+accuracy is far below the Main64/Main115 references. SVM and LR on the
+learned vector improve over the neural classifier but reach only 81.0247%.
+The between/within ratio of 0.6627 also indicates poor class separation
+under this distance measure. Therefore the BiGRU branch is retired
+without hyperparameter tuning and is not promoted to later fusion phases.
+The learned embeddings and checkpoint are retained for record keeping.
+
+EXPERIMENT 3 RESULT — RAW TOKENS → TRANSFORMER
+==============================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token embedding: 128-D
+- Transformer heads: 4
+- Transformer layers: 2
+- Feed-forward dimension: 256
+- Dropout: 0.2
+- Learned latent vector: 128-D
+- Batch size: 32
+- Trainable parameters: 2,674,689
+- Best epoch: 6
+
+Results:
+- Neural Transformer validation accuracy: 79.0323%
+- Neural Transformer validation AUC: 0.8872
+- SVM on learned z: 79.2220%
+- SVM AUC: 0.8845
+- Logistic Regression on learned z: 79.5066%
+- LR AUC: 0.8846
+- Between-class centroid distance: 7.9813
+- Within-class mean distance: 8.3735
+- Between/within ratio: 0.9532
+- Training + evaluation time: ~8.64 min
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The raw-token Transformer learned a weak standalone representation for
+this task. Its AUC of 0.8872 is the strongest AUC among the three Phase 1
+raw-token encoders tested so far, so it contains some class-related signal,
+but its accuracy remains far below the Main64/Main115 references. SVM and
+LR on the learned vector do not recover the lost performance, reaching only
+79.2220% and 79.5066% respectively. The between/within ratio of 0.9532 also
+does not indicate strong class separation. The Transformer branch is
+therefore retired without hyperparameter tuning.
+
+Important future note:
+Do not permanently discard this branch. Its embeddings and checkpoint are
+retained for a later detailed Transformer study and for complementary
+fusion. Later we can test stronger architecture/training choices, longer
+context, alternative pooling, and especially strict OOF fusion with the
+strong classical models. This revisit should happen after the broader
+representation sweep so that we do not repeatedly tune against the same
+validation set.
+
+
+EXPERIMENT 4 RESULT — TF-IDF → SVD → MLP ENCODER
+================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Input: word/token TF-IDF
+- TF-IDF n-grams: 1–3
+- TF-IDF min_df: 2
+- TF-IDF max_df: 0.995
+- TF-IDF max_features: 60,000
+- Sublinear TF: enabled
+- SVD components: 256
+- SVD explained variance ratio: 0.1743
+- MLP hidden layers: 256 → 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 140,865
+- Best epoch: 2
+- Runtime: ~0.25 min
+
+Results:
+- Neural MLP validation accuracy: 81.4991%
+- Neural MLP validation AUC: 0.9296
+- SVM on learned z: 78.9848%
+- SVM AUC: 0.9282
+- Logistic Regression on learned z: 78.9848%
+- LR AUC: 0.9283
+- Between-class centroid distance: 11.0618
+- Within-class mean distance: 5.8832
+- Between/within ratio: 1.8802
+
+Training behavior:
+- Train accuracy reached 94.0081% at the selected checkpoint.
+- Validation loss was best at epoch 2 and then increased sharply.
+- By epoch 8, train loss had fallen to 0.0691 while validation loss had risen
+  to 0.8776, showing strong overfitting.
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The TF-IDF → SVD → MLP representation is weak as a standalone classifier:
+81.4991% validation accuracy is far below the Main64/Main115 references, and
+SVM/LR on the learned 128-D vector perform even worse at 78.9848%.
+
+However, this branch is more interesting than its accuracy alone suggests.
+Its validation AUC of 0.9296 is substantially stronger than the three
+raw-token Phase 1 neural encoders tested so far, indicating that the latent
+representation preserves useful class-ranking information even though the
+classification boundary is poor. The between/within ratio of 1.8802 is also
+higher than the raw-token experiments.
+
+The main failure is therefore not absence of signal but poor standalone
+classification/generalization of the learned latent space. The very early
+best epoch and widening train/validation loss gap indicate overfitting.
+The branch is retired without immediate hyperparameter tuning, but its
+embeddings are retained for possible complementary fusion with the strong
+classical pipeline in a later phase.
+
+
+
+EXPERIMENT 5 RESULT — TRANSITION TF-IDF → SVD → MLP ENCODER
+============================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Input: adjacent-token transitions
+- Transition format: token_i>token_i+1
+- TF-IDF n-grams: 1–2 over transition tokens
+- TF-IDF min_df: 2
+- TF-IDF max_df: 0.995
+- TF-IDF max_features: 60,000
+- Sublinear TF: enabled
+- SVD components: 256
+- SVD explained variance ratio: 0.1452
+- MLP hidden layers: 256 → 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 140,865
+- Best epoch: 2
+- Runtime: ~0.22 min
+
+Results:
+- Neural MLP validation accuracy: 77.8463%
+- Neural MLP validation AUC: 0.8964
+- SVM on learned z: 75.0000%
+- SVM AUC: 0.8921
+- Logistic Regression on learned z: 75.6641%
+- LR AUC: 0.8958
+- Between-class centroid distance: 6.1236
+- Within-class mean distance: 3.7108
+- Between/within ratio: 1.6502
+
+Training behavior:
+- Validation loss was best at epoch 2.
+- Train loss continued falling after epoch 2 while validation loss increased.
+- By epoch 8, train loss was 0.1267 while validation loss had risen to 0.7288,
+  indicating clear overfitting.
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Conclusion:
+The transition TF-IDF → SVD → MLP representation is weak as a standalone
+classifier. Validation accuracy of 77.8463% is substantially below the
+Main64/Main115 references, and SVM/LR on the learned vector perform even
+worse.
+
+The representation does contain class-related information, as shown by
+AUC 0.8964 and a between/within ratio of 1.6502, but it is clearly weaker
+than the word/token TF-IDF representation from Experiment 4. Its SVD also
+captures less variance (14.52% versus 17.43% for Experiment 4).
+
+Therefore this branch is retired without hyperparameter tuning. The
+embeddings/checkpoint are retained for record keeping and possible later
+complementary fusion, but this representation is not promoted as a primary
+candidate.
+
+
+
+EXPERIMENT 6 RESULT — STRUCTURAL FEATURES → MLP → LATENT VECTOR
+===============================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Input: 62 compact structural/statistical features
+- Feature groups: length, token diversity, entropy, frequency concentration,
+  transition statistics, positional statistics, chunk statistics, and local
+  variability
+- Standardization: fitted on TRAIN ONLY
+- MLP hidden layers: 128 → 96
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 33,441
+- Best epoch: 8
+- Runtime: ~0.21 min
+
+Results:
+- Neural MLP validation accuracy: 80.8824%
+- Neural MLP validation AUC: 0.8888
+- SVM on learned z: 80.0285%
+- SVM AUC: 0.8868
+- Logistic Regression on learned z: 79.9336%
+- LR AUC: 0.8889
+- Between-class centroid distance: 5.8550
+- Within-class mean distance: 4.7177
+- Between/within ratio: 1.2411
+
+Training behavior:
+- Validation loss reached its best value at epoch 8.
+- The model did not show the severe early overfitting seen in the
+  TF-IDF/SVD and transition-TF-IDF/SVD experiments.
+- After epoch 8, validation loss generally remained above the best value,
+  while training loss continued to decline.
+- Early stopping occurred at epoch 15.
+
+Reference:
+- Main64: 93.0266%
+- Main115: 93.4535%
+
+Comparison with previous Phase 1 experiments:
+- Better standalone accuracy than the transition TF-IDF branch (77.8463%).
+- Similar standalone accuracy to the word/token TF-IDF → SVD → MLP branch
+  only in the broad sense that both remain far below the classical reference;
+  Main125/Experiment 4 is clearly stronger at 81.4991% and AUC 0.9296.
+- Structural AUC (0.8888) is weaker than Experiment 4 (0.9296) and
+  Experiment 5 (0.8964).
+- The learned structural representation also has a lower between/within
+  ratio (1.2411) than Experiment 4 (1.8802) and Experiment 5 (1.6502).
+
+Conclusion:
+The structural-feature MLP learns some class-related information, but its
+standalone performance is well below the Main64/Main115 references.
+SVM/LR on the learned vector do not materially improve the representation,
+and the latent geometry is weaker than the strongest Phase 1 branches.
+
+Therefore the structural branch is retired as a standalone candidate
+without hyperparameter tuning. Its embeddings are retained because
+structural information may still be complementary to lexical and learned
+representations in later fusion experiments.
+
+
+
+EXP 7 RESULT — TOKENS + TF-IDF
+==============================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token encoder: embedding 96-D + BiGRU hidden 96-D/direction
+- Token branch output: 128-D
+- Direct word TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- TF-IDF branch output: 96-D
+- Fusion MLP hidden: 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 64
+- Trainable parameters: 13,514,465
+- Best epoch: 1
+- Runtime: ~0.68 min
+- SVD: NONE
+
+Results:
+- Neural validation accuracy: 82.9696%
+- Neural validation AUC: 0.9412
+- SVM on learned z: 87.1442%
+- SVM AUC: 0.9380
+- Logistic Regression on learned z: 86.6698%
+- LR AUC: 0.9385
+- Between-class centroid distance: 12.3781
+- Within-class mean radius: 5.5089
+- Between/within ratio: 2.2469
+
+Training behavior:
+- Epoch 1: train acc 80.90%, val acc 82.97%, val AUC 0.9412.
+- Epoch 2: train acc 97.31%, while val loss increased from 0.2283 to 0.2927.
+- Epoch 3: train acc 99.03%, val acc peaked at 87.00%, but val loss
+  continued increasing and AUC fell to 0.9383.
+- Later epochs continued to overfit; early stopping occurred at epoch 7.
+- The selected checkpoint is epoch 1 because model selection uses validation loss.
+
+Interpretation:
+- The latent representation contains substantial class-related information.
+- SVM-on-z substantially outperforms the neural classifier, reaching 87.14%.
+- AUC 0.9412 and between/within ratio 2.2469 make this one of the
+  more interesting learned representations in the sweep.
+- Nevertheless, standalone accuracy remains below Main64/Main115.
+- The 13.5M parameter model overfits extremely quickly, so immediate
+  hyperparameter tuning is not justified.
+
+Decision:
+- Retire as a standalone classifier.
+- Retain main127_embeddings.npz and main127_best.pt.
+- Use the learned representation as a possible complementary branch
+  in later fusion experiments.
+
+EXP 8 RESULT — TOKENS + STRUCTURAL
+====================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Token encoder: embedding 96-D + BiGRU hidden 96-D/direction
+- Token branch output: 128-D
+- Structural input: 62 compact structural/statistical features
+- Structural branch output: 64-D
+- Fusion MLP hidden: 160
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 64
+- Trainable parameters: 1,545,025
+- Best epoch: 2
+- Runtime: ~0.93 min
+- TF-IDF: NONE
+- SVD: NONE
+
+Results:
+- Neural validation accuracy: 83.4440%
+- Neural validation AUC: 0.9410
+- SVM on learned z: 85.9583%
+- SVM AUC: 0.9258
+- Logistic Regression on learned z: 86.4326%
+- LR AUC: 0.9432
+- Between-class centroid distance: 15.4819
+- Within-class mean radius: 8.8316
+- Between/within ratio: 1.7530
+
+Training behavior:
+- Epoch 1: train acc 76.78%, val acc 81.97%, val AUC 0.9251.
+- Epoch 2: train acc 85.56%, val acc 83.44%, val AUC 0.9410; validation loss was best here.
+- Epoch 3: train acc 89.62%, val acc 86.20%, while validation loss increased to 0.2685.
+- Epoch 4: train acc 93.20%, val acc peaked at 87.10%, while validation loss increased further to 0.3349.
+- Epochs 5–8 continued to show declining training loss with unstable/worsening validation loss; early stopping occurred after epoch 8.
+
+Interpretation:
+- The combined token + structural representation contains useful class-related information.
+- LR-on-z reaches 86.43% with AUC 0.9432, the strongest AUC among the three reported classifiers for this experiment.
+- The neural classifier and latent classifiers remain substantially below Main115 (93.4535%), so this is not a standalone replacement.
+- Compared with Experiment 7 (Tokens + TF-IDF), Exp 8 has far fewer parameters (1.55M vs 13.51M) and similar neural AUC (0.9410 vs 0.9412), but weaker SVM/LR accuracy and lower between/within ratio (1.7530 vs 2.2469).
+- Therefore the branch is retired as a standalone candidate, but the embeddings are retained because structural information may still be complementary to the stronger classical/learned representations.
+- Do not spend time hyperparameter-tuning this branch now; carry its embeddings forward only if a later strict OOF fusion test needs an additional complementary signal.
+
+EXP 9 RESULT — TOKENS + TRANSITION TF-IDF
+==============================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Vocabulary size: 13,858
+- Token encoder: embedding 96-D + BiGRU hidden 96-D/direction
+- Token branch output: 128-D
+- Transition TF-IDF: adjacent-token transitions, n-grams 1–2
+- Transition TF-IDF min_df: 2
+- Transition TF-IDF max_df: 0.995
+- Transition TF-IDF max_features: 60,000
+- Sublinear TF: enabled
+- Transition branch output: 96-D
+- Fusion MLP hidden: 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 64
+- Trainable parameters: 16,921,377
+- Best epoch: 1
+- Runtime: ~1.13 min
+- SVD: NONE
+
+Results:
+- Neural validation accuracy: 84.5351%
+- Neural validation AUC: 0.9167
+- SVM on learned z: 83.1594%
+- SVM AUC: 0.8689
+- Logistic Regression on learned z: 83.1594%
+- LR AUC: 0.9138
+- Between-class centroid distance: 6.3217
+- Within-class mean radius: 2.9076
+- Between/within ratio: 2.1742
+
+Training behavior:
+- Epoch 1: train acc 80.28%, val acc 84.54%, val AUC 0.9167; validation loss was best.
+- Epoch 2: train acc jumped to 96.32%, while val accuracy fell to 82.50% and val loss rose sharply.
+- Epochs 3–7 continued to drive training accuracy toward 99.87% without recovering validation performance.
+- Early stopping occurred at epoch 7.
+- This is another clear example of rapid overfitting in the direct high-dimensional TF-IDF fusion architecture.
+
+Comparison:
+- Neural accuracy is 84.54%, below the strongest Phase 2 result so far in terms of latent quality.
+- Its AUC of 0.9167 is substantially below Experiment 7 (0.9412) and Experiment 8 (0.9410).
+- SVM/LR on z also do not match Experiment 7/8, especially the SVM AUC.
+- The between/within ratio (2.1742) is relatively strong, but this geometry does not translate into a robust decision boundary.
+- Performance remains far below the Main115 local reference of 93.4535%.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not spend time hyperparameter-tuning this branch now.
+- Retain main129_embeddings.npz and main129_best.pt for possible complementary strict-OOF fusion.
+- The transition branch may still carry information that differs from word TF-IDF and structural features, so its usefulness should be judged by error complementarity rather than standalone accuracy.
+
+
+EXP 12 RESULT — TRANSITION TF-IDF + STRUCTURAL
+================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Transition representation: adjacent token transitions token_i>token_i+1
+- Transition TF-IDF: 1–2 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Structural input: 62 compact structural/statistical features
+- Structural scaling: StandardScaler fitted on TRAIN ONLY
+- Transition branch output: 128-D
+- Structural branch output: 128-D
+- Fusion MLP hidden: 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Gradient clipping: 5.0
+- Trainable parameters: 7,763,521
+- Best epoch: 1
+- Runtime: ~0.72 min
+
+Results:
+- Neural validation accuracy: 88.2353%
+- Neural validation AUC: 0.9520
+- SVM on learned z: 88.1879%
+- SVM AUC: 0.9545
+- Logistic Regression on learned z: 88.2353%
+- LR AUC: 0.9560
+- Between-class centroid distance: 6.6629
+- Within-class mean radius: 5.0423
+- Between/within ratio: 1.3214
+
+Training behavior:
+- Epoch 1: train accuracy 83.26%, validation accuracy 88.24%,
+  validation AUC 0.9520, and best validation loss 0.2745.
+- Epoch 2: train accuracy jumped to 98.39%; validation accuracy improved
+  to 88.80% and AUC to 0.9541, but validation loss increased to 0.2984.
+- Epoch 3: train accuracy reached 99.69%; validation accuracy reached
+  89.09%, but validation loss increased to 0.3293.
+- Epoch 4: train accuracy reached 99.89%; validation accuracy remained
+  around 89.04%, while AUC fell to 0.9502.
+- Epochs 5–7 continued near-perfect training accuracy while validation
+  loss worsened; early stopping occurred at epoch 7.
+- The best-loss checkpoint is epoch 1 even though later epochs show
+  higher threshold accuracy. Do not replace the selected checkpoint
+  simply because a later epoch has a higher 0.5-threshold accuracy.
+
+Comparison with Exp11 / Main131:
+- Exp11 TF-IDF + STRUCTURAL achieved 89.8482% neural accuracy and
+  0.9626 neural AUC.
+- Exp11 LR-on-z achieved 90.2751% accuracy and 0.9664 AUC.
+- Exp12 TRANSITION TF-IDF + STRUCTURAL achieves 88.2353% neural accuracy
+  and 0.9520 AUC.
+- Exp12 LR-on-z achieves 88.2353% and 0.9560 AUC.
+- Therefore the word/token TF-IDF + structural combination is clearly
+  stronger as a standalone learned representation than the transition
+  TF-IDF + structural combination under this architecture.
+- Exp12 is nevertheless substantially stronger than the earlier
+  SVD transition-only representation (Experiment 5), whose neural
+  accuracy was 77.8463% and AUC 0.8964.
+- Exp12 has the same parameter count as Exp11 because only the sparse
+  input representation differs; the lower performance therefore points
+  toward the representation rather than model capacity.
+
+Interpretation:
+- Structural features remain useful when paired with transition TF-IDF:
+  the combination reaches AUC above 0.95.
+- However, the transition representation does not exploit the structural
+  branch as effectively as direct word/token TF-IDF does.
+- The similar between/within ratios (Exp11 1.3320 vs Exp12 1.3214) show
+  that centroid geometry alone does not explain the difference.
+- Exp12 is not a candidate to replace Main115 as a standalone classifier.
+- Its learned embeddings should still be retained because transition
+  information can be complementary even when standalone accuracy is lower.
+  This must be tested later using strict OOF fusion rather than inferred
+  from validation accuracy alone.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not spend time hyperparameter-tuning this branch now.
+- Retain main132_embeddings.npz and main132_best.pt.
+- Keep it available as a possible complementary branch for later
+  strict-OOF fusion.
+- Proceed to Phase 3, Experiment 13: TOKENS + TF-IDF + STRUCTURAL.
+
+
+EXP 11 RESULT — TF-IDF + STRUCTURAL
+====================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Structural input: 62 compact structural/statistical features
+- Structural scaling: StandardScaler fitted on TRAIN ONLY
+- TF-IDF branch output: 128-D
+- Structural branch output: 128-D
+- Fusion MLP hidden: 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 7,763,521
+- Best epoch: 1
+- Runtime: ~0.69 min
+
+Results:
+- Neural validation accuracy: 89.8482%
+- Neural validation AUC: 0.9626
+- SVM on learned z: 90.3700%
+- SVM AUC: 0.9636
+- Logistic Regression on learned z: 90.2751%
+- LR AUC: 0.9664
+- Between-class centroid distance: 6.9470
+- Within-class mean radius: 5.2156
+- Between/within ratio: 1.3320
+
+Training behavior:
+- Epoch 1: train acc 85.13%, val acc 89.85%, val AUC 0.9626;
+  validation loss was best at 0.2477.
+- Epoch 2: train acc jumped to 98.66%, while val accuracy improved to
+  90.61% and AUC to 0.9663, but validation loss increased slightly.
+- Epoch 3: train acc reached 99.86%; val accuracy reached 90.70%,
+  but validation loss increased to 0.2760.
+- Epoch 4: train acc 99.94%; val accuracy peaked at 90.75%, while
+  validation loss increased further to 0.2991 and AUC fell to 0.9640.
+- Epochs 5–7 continued showing near-perfect training accuracy without
+  validation-loss improvement; early stopping occurred at epoch 7.
+- As with Exp10, the best-loss checkpoint is epoch 1 even though later
+  epochs have higher threshold accuracy. Do not silently replace the
+  selected checkpoint using the accuracy peak.
+
+Comparison:
+- Exp11 neural AUC 0.9626 is higher than Exp10's 0.9504.
+- Exp11 LR-on-z AUC 0.9664 is also higher than Exp10's 0.9486.
+- Exp11 standalone accuracy (89.85%) is substantially better than Exp10
+  (83.92%) and is the strongest neural validation accuracy among the
+  Phase 2 pairwise fusion experiments completed so far.
+- SVM/LR on z reach about 90.3%, still well below Main115's 93.4535%.
+- The between/within ratio of 1.3320 is lower than Exp10's 1.9684,
+  so the distance geometry alone does not explain the stronger
+  classification/ranking performance.
+- The model has 7.76M parameters, substantially fewer than Exp10's
+  30.86M, yet achieves stronger AUC and better standalone accuracy.
+- The very rapid rise in training accuracy confirms substantial
+  overfitting in the direct high-dimensional TF-IDF fusion architecture.
+
+Interpretation:
+- This is a strong representation result. The combination of lexical
+  TF-IDF information and compact structural information produces the
+  strongest Phase 2 AUC observed so far:
+  LR-on-z AUC 0.9664.
+- The improvement over Exp10 suggests structural information adds useful
+  signal to direct word TF-IDF rather than merely increasing dimensionality.
+- However, the learned representation is still not competitive with the
+  Main115 classical reference as a standalone classifier.
+- Its main value is therefore as a candidate complementary representation
+  for later strict OOF fusion with the classical pipeline.
+- Do not spend time hyperparameter-tuning this branch now. Preserve the
+  learned embeddings and evaluate complementarity later under strict OOF
+  rules.
+
+Decision:
+- Retire as a standalone classifier.
+- Retain main131_embeddings.npz and main131_best.pt.
+- Promote Exp11/Main131 as a high-priority candidate for later
+  complementary strict-OOF fusion.
+- Continue to Experiment 12: Transition TF-IDF + Structural.
+
+EXP 10 RESULT — TF-IDF + TRANSITION TF-IDF
+===========================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 42
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams,
+  min_df=2, max_df=0.995, max_features=60,000, sublinear TF
+- Word branch output: 128-D
+- Transition branch output: 128-D
+- Fusion MLP hidden: 192
+- Learned latent vector: 128-D
+- Dropout: 0.2
+- Batch size: 128
+- Trainable parameters: 30,861,889
+- Best epoch: 1
+- Runtime: ~0.82 min
+- SVD: NONE
+
+Results:
+- Neural validation accuracy: 83.9184%
+- Neural validation AUC: 0.9504
+- SVM on learned z: 87.9507%
+- SVM AUC: 0.9462
+- Logistic Regression on learned z: 88.0930%
+- LR AUC: 0.9486
+- Between-class centroid distance: 6.8803
+- Within-class mean radius: 3.4954
+- Between/within ratio: 1.9684
+
+Training behavior:
+- Epoch 1: train acc 81.92%, val acc 83.92%, val AUC 0.9504.
+- Epoch 2: train acc jumped to 98.30%; val acc improved to 87.43%,
+  but validation loss increased from 0.3543 to 0.4000.
+- Epoch 4 reached the highest observed validation accuracy of 87.81%,
+  but validation loss remained substantially above the epoch-1 minimum.
+- By epoch 6, training accuracy was essentially 100% while validation
+  performance remained around 87%.
+- Early stopping occurred at epoch 7.
+- The large train/validation gap confirms severe overfitting in the
+  high-dimensional direct-TF-IDF fusion.
+
+Interpretation:
+- This is the strongest AUC obtained so far in the Phase 2 fusion sweep:
+  0.9504 neural, with LR-on-z AUC 0.9486.
+- The learned representation is substantially better than Experiment 9
+  (Tokens + Transition TF-IDF), and its LR/SVM latent accuracy is also
+  stronger than Experiment 9.
+- The result is still well below the Main115 local validation reference
+  of 93.4535% when used as a standalone classifier.
+- The high AUC is particularly interesting: the representation appears
+  to preserve useful ranking information even though its learned
+  classification boundary is not strong enough to approach the
+  classical pipeline.
+- The best-loss checkpoint is epoch 1, while later epochs produce higher
+  validation accuracy at the 0.5 threshold. This confirms that model
+  selection by loss and threshold accuracy are behaving differently;
+  we should not silently select epoch 4 just because its accuracy is
+  higher.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not spend time hyperparameter-tuning this branch now.
+- Retain main130_embeddings.npz and main130_best.pt.
+- This branch is worth testing in later strict OOF complementary fusion
+  because its AUC is the strongest Phase 2 result so far and it may
+  contain information not captured by Main64/Main115.
+
+
+
+EXP 18 RESULT — BEST MODEL + CROSS-ENTROPY
+==========================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Raw token input: max sequence length 384; vocabulary 13,717
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Word TF-IDF SVD: 256 dimensions; explained variance: 17.4321%
+- Structural input: 62 compact structural/statistical features
+- Token embedding: 96-D
+- BiGRU hidden: 96-D per direction
+- Branch dimension: 96
+- Fusion latent vector: 128-D
+- Trainable parameters: 1,559,105
+- Loss: BCEWithLogitsLoss / binary cross-entropy
+- Optimizer: AdamW
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Batch size: 64
+- Best epoch: 2
+- Runtime: ~26.09 sec
+
+Results:
+- Neural validation accuracy: 86.2903%
+- Neural validation AUC: 0.9540
+- SVM on learned z: 88.0455%
+- SVM AUC: 0.9575
+- Logistic Regression on learned z: 87.8558%
+- LR AUC: 0.9587
+- Between-class centroid distance: 16.1766
+- Within-class mean distance: 5.6052
+- Between/within ratio: 2.8860
+
+Training behavior:
+- Epoch 1: train acc 79.33%, val acc 84.44%, AUC 0.9416.
+- Epoch 2: train acc 88.25%, val acc 86.29%, AUC 0.9540;
+  validation loss reached its minimum.
+- Epoch 3: train acc 92.54%, val acc improved to 87.90% and AUC to
+  0.9590, but validation loss increased above the epoch-2 minimum.
+- Epoch 4 onward: training accuracy continued rising while validation
+  loss generally worsened, with unstable validation accuracy/AUC.
+- Early stopping occurred after epoch 9.
+- As with several previous neural fusion models, the architecture
+  overfits quickly.
+
+Interpretation:
+- Exp18 is a controlled Phase 4 baseline: the strongest Phase-3
+  representation, TOKENS + WORD TF-IDF + STRUCTURAL, trained with an
+  explicit BCE classification objective.
+- It does not improve the latent representation over Exp13/Main133.
+- Neural accuracy is 86.29%, compared with Exp13's 89.61%.
+- LR-on-z is 87.86%, compared with Exp13's 90.80%.
+- LR-on-z AUC is 0.9587, compared with Exp13's 0.9695.
+- The between/within ratio is 2.8860, higher than Exp13's 2.6510,
+  but this again does not translate into stronger classification.
+- Therefore the result reinforces an important observation from the
+  sweep: centroid-distance geometry alone is not a reliable predictor
+  of classification quality.
+- The BCE objective is a useful baseline for the next experiments,
+  but BCE by itself does not solve the representation/generalization
+  problem.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not tune Exp18 extensively before testing the intended Phase 4
+  contrastive objectives.
+- Retain main138_embeddings.npz and main138_best.pt.
+- Proceed to Experiment 19: BEST MODEL + CROSS-ENTROPY + CONTRASTIVE LOSS.
+
+
+EXP 13 RESULT — TOKENS + TF-IDF + STRUCTURAL
+=============================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 133
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Max sequence length: 384
+- Raw token encoder: embedding 96-D + bidirectional GRU, hidden 96-D/direction
+- Raw token branch output: 128-D
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- TF-IDF SVD: 256 dimensions
+- TF-IDF SVD explained variance: 17.4269%
+- Structural input: 62 compact structural/statistical features
+- Structural scaling: StandardScaler fitted on TRAIN ONLY
+- Each branch output: 128-D
+- Fusion hidden: 256
+- Learned latent vector: 128-D
+- Dropout: 0.2; fusion dropout: 0.25
+- Batch size: 64
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 1,681,057
+- Best epoch: 3
+- Runtime: ~1.47 min
+
+Results:
+- Neural validation accuracy: 89.6110%
+- Neural validation AUC: 0.9578
+- SVM on learned z: 89.6110%
+- SVM AUC: 0.9450
+- Logistic Regression on learned z: 90.7970%
+- LR AUC: 0.9695
+- Between-class centroid distance: 23.1165
+- Within-class mean radius: 8.7200
+- Between/within ratio: 2.6510
+
+Training behavior:
+- Epoch 1: train acc 81.36%, val acc 86.53%, AUC 0.9496.
+- Epoch 2: train acc 89.74%, val acc 88.43%, AUC 0.9526.
+- Epoch 3: train acc 91.90%, val acc 89.61%, AUC 0.9578; validation loss was best.
+- Epoch 4: train acc 95.22%, while val accuracy fell to 88.90% and
+  validation loss increased.
+- Later epochs continued increasing training accuracy while validation
+  loss worsened; early stopping occurred at epoch 9.
+
+Interpretation:
+- Exp13 is a strong multi-input representation. Its LR-on-z AUC of
+  0.9695 is higher than Main131's 0.9664, making it the strongest
+  learned-representation AUC observed so far.
+- Its standalone validation accuracy (89.61%) is slightly below Main131
+  (89.85%), while LR-on-z accuracy (90.80%) is slightly above Main131
+  (90.28%). Thus the learned latent space is highly informative even
+  though it does not approach Main115 as a standalone classifier.
+- The between/within ratio of 2.6510 is substantially higher than
+  Main131's 1.3320, indicating much stronger centroid separation under
+  this diagnostic. This should not be interpreted as proof of better
+  classification by itself, but it makes the representation interesting.
+- The combination of raw tokens, lexical TF-IDF, and structural features
+  therefore appears to preserve complementary information. Whether that
+  information is genuinely new relative to Main64/Main115 still requires
+  strict OOF complementarity testing.
+- The model overfits quickly after epoch 3, so immediate hyperparameter
+  tuning is not justified during this broad representation sweep.
+
+Decision:
+- Retire as a standalone classifier.
+- Retain main133_embeddings.npz and main133_best.pt.
+- Promote Exp13/Main133 as a high-priority candidate for later strict-OOF
+  fusion, alongside Main131.
+- Proceed to Experiment 14: TOKENS + TF-IDF + TRANSITION TF-IDF.
+
+
+
+
+EXP 15 RESULT — TOKENS + TRANSITION TF-IDF + STRUCTURAL
+========================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 135
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Raw token input: max sequence length 384; vocabulary 13,717
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams, min_df=2,
+  max_df=0.995, max_features=60,000, sublinear TF
+- Transition TF-IDF SVD: 256 dimensions; explained variance: 14.5210%
+- Structural input: 62 compact structural/statistical features
+- Structural scaling: StandardScaler fitted on TRAIN ONLY
+- Token embedding: 96-D
+- BiGRU hidden: 96-D per direction
+- Branch dimension: 96
+- Fusion latent vector: 128-D
+- Trainable parameters: 1,559,105
+- Batch size: 64
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Best epoch: 3
+- Runtime: ~29.01 sec
+
+Results:
+- Neural validation accuracy: 87.0493%
+- Neural validation AUC: 0.9514
+- SVM on learned z: 88.2827%
+- SVM AUC: 0.9514
+- Logistic Regression on learned z: 88.6622%
+- LR AUC: 0.9525
+- Between-class centroid distance: 17.6194
+- Within-class mean distance: 6.3159
+- Between/within ratio: 2.7897
+
+Training behavior:
+- Epoch 1: train acc 76.92%, val acc 80.98%, AUC 0.9268.
+- Epoch 2: train acc 87.77%, val acc 82.59%, AUC 0.9474.
+- Epoch 3: train acc 91.66%, val acc 87.05%, AUC 0.9514;
+  validation loss reached its overall minimum.
+- Epoch 4: train acc 94.52%, while val accuracy fell to 84.25% and
+  validation loss increased sharply.
+- Later epochs continued increasing training accuracy while validation
+  loss worsened; early stopping occurred after epoch 10.
+- The representation therefore shows the same rapid-overfitting pattern
+  seen in several earlier neural fusion experiments.
+
+Interpretation:
+- Exp15 successfully tests the missing Phase 3 combination:
+  raw tokens + transition TF-IDF + structural features.
+- Its LR-on-z accuracy of 88.66% and AUC of 0.9525 show useful
+  class-related information, but it is clearly below Exp13/Main133,
+  whose LR-on-z reaches 90.80% with AUC 0.9695.
+- The neural accuracy of 87.05% is also below Exp13's 89.61%.
+- The between/within ratio of 2.7897 is relatively strong, but again does
+  not translate into stronger classification. This reinforces that
+  centroid-distance geometry alone is not sufficient to establish a
+  better representation.
+- Adding transition information to tokens + structural features does not
+  outperform the corresponding word-TF-IDF combination in Exp13 under
+  this architecture.
+- The representation is therefore not a primary standalone candidate,
+  but the saved embeddings may still contain complementary information
+  that should be judged later by strict OOF error complementarity.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not hyperparameter-tune this branch during the broad sweep.
+- Retain main135_embeddings.npz and main135_best.pt for possible strict-OOF
+  complementarity testing.
+- Phase 3 is now complete; proceed to Experiment 18 after recording
+  Experiment 17, using the strongest Phase 3 representation as the
+  starting point.
+
+
+EXP 16 RESULT — TF-IDF + TRANSITION TF-IDF + STRUCTURAL
+========================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 136
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Word TF-IDF SVD: 256 dimensions; explained variance: 17.4289%
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams,
+  min_df=2, max_df=0.995, max_features=60,000, sublinear TF
+- Transition SVD: 256 dimensions; explained variance: 14.5223%
+- Structural input: 62 compact structural/statistical features
+- Structural scaling: StandardScaler fitted on TRAIN ONLY
+- Word branch output: 128-D
+- Transition branch output: 128-D
+- Structural branch output: 128-D
+- Fusion hidden: 256
+- Learned latent vector: 128-D
+- Dropout: 0.2; fusion dropout: 0.25
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 304,257
+- Best epoch: 2
+- Runtime: ~2.96 sec
+
+Results:
+- Neural validation accuracy: 82.8273%
+- Neural validation AUC: 0.9495
+- SVM on learned z: 86.3852%
+- SVM AUC: 0.9058
+- Logistic Regression on learned z: 86.6224%
+- LR AUC: 0.9504
+- Between-class centroid distance: 11.7914
+- Within-class mean radius: 4.9556
+- Between/within ratio: 2.3794
+
+Training behavior:
+- Epoch 1: train acc 75.33%, val acc 86.62%, val AUC 0.9346.
+- Epoch 2: train acc 88.59%, val acc 88.24%, val AUC 0.9495;
+  validation loss was best.
+- Epoch 3: train acc 91.30%, val acc 88.38%, AUC 0.9601,
+  but validation loss increased.
+- Epoch 4: train acc 93.17%, val acc 88.28%, AUC 0.9576,
+  with validation loss still above the epoch-2 minimum.
+- Epochs 5–8 show continued training improvement but worsening
+  validation loss; early stopping occurred at epoch 8.
+- As in several earlier experiments, threshold accuracy/AUC can improve
+  after the best-loss epoch, so the selected checkpoint remains epoch 2.
+
+Interpretation:
+- Exp16 is substantially stronger than the single-representation
+  transition/structural experiments in latent AUC, but it is clearly
+  weaker than Exp11/Main131 and Exp13/Main133 on latent accuracy.
+- LR-on-z reaches 86.62%, with AUC 0.9504. This is below Main131's
+  90.28% LR-on-z accuracy / 0.9664 AUC and Main133's 90.80% /
+  0.9695 AUC.
+- The neural classifier reaches only 82.83%, so the learned classifier
+  itself is not competitive with the strongest Phase 2/3 representations.
+- The between/within ratio of 2.3794 is reasonably strong and higher than
+  Main131's 1.3320, but this geometry does not translate into comparable
+  classification accuracy. This reinforces that centroid-distance
+  separation alone is not sufficient.
+- Removing the raw-token branch does not produce a stronger representation
+  than the token-inclusive alternatives tested so far.
+- The experiment is therefore not a primary candidate for later tuning,
+  but its embedding can remain available if strict OOF complementarity
+  analysis later shows genuinely different errors.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not hyperparameter-tune this branch during the current sweep.
+- Retain main136_embeddings.npz and main136_best.pt.
+- Exp16 is lower priority than Exp13/Main133 and Exp11/Main131 for later
+  strict-OOF fusion.
+- Continue with Phase 3 Experiment 15 after the corrected Main135 script
+  produces a valid result; then run Experiment 17 (EVERYTHING).
+
+
+
+EXP 17 RESULT — EVERYTHING
+==========================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 137
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Raw token input: max sequence length 384; vocabulary 13,717
+- Word/token TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Word TF-IDF SVD: 256 dimensions; explained variance: 17.4254%
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams,
+  min_df=2, max_df=0.995, max_features=60,000, sublinear TF
+- Transition SVD: 256 dimensions; explained variance: 14.5211%
+- Structural input: 62 compact structural/statistical features
+- Structural scaling: StandardScaler fitted on TRAIN ONLY
+- Token branch + word branch + transition branch + structural branch
+  fused into a 128-D latent vector
+- Branch dimension: 96
+- Token embedding: 96-D
+- BiGRU hidden: 96-D per direction
+- Fusion hidden: 192
+- Learned latent vector: 128-D
+- Batch size: 64
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Trainable parameters: 1,602,401
+- Best epoch: 3
+- Runtime: ~28.89 sec
+
+Results:
+- Neural validation accuracy: 87.5237%
+- Neural validation AUC: 0.9512
+- SVM on learned z: 87.2391%
+- SVM AUC: 0.9550
+- Logistic Regression on learned z: 87.6186%
+- LR AUC: 0.9560
+- Between-class centroid distance: 16.5745
+- Within-class mean radius: 5.6784
+- Between/within ratio: 2.9189
+
+Training behavior:
+- Epoch 1: train acc 79.32%, val acc 84.96%, val AUC 0.9365;
+  validation loss was best at 0.2233 at this point.
+- Epoch 2: train acc 88.98%, val acc fell to 80.31%, but AUC rose
+  to 0.9568; validation loss increased to 0.2501.
+- Epoch 3: train acc 92.94%, val acc 87.52%, AUC 0.9512;
+  validation loss reached its overall best value of 0.2052.
+- Epoch 4: train acc 94.97%, val accuracy reached 88.57% and AUC
+  0.9554, but validation loss increased to 0.2271.
+- Epochs 5–10 continued driving training accuracy toward 99% while
+  validation loss worsened; early stopping occurred after epoch 10.
+- The selected checkpoint is therefore epoch 3 because model selection
+  uses validation loss, not the later threshold-accuracy peak.
+
+Interpretation:
+- Exp17 successfully combines all four information sources, but the
+  resulting representation is not stronger than Exp13/Main133.
+- Neural accuracy is 87.52%, compared with Exp13's 89.61%.
+- LR-on-z accuracy is 87.62%, compared with Exp13's 90.80%.
+- LR-on-z AUC is 0.9560, well below Exp13's 0.9695.
+- The between/within ratio of 2.9189 is the highest among the current
+  Phase 3 results, but the stronger geometry does not translate into
+  stronger classification. This is another example that centroid
+  separation alone is not sufficient to establish a better classifier.
+- Adding transition information to the strong tokens + word TF-IDF +
+  structural combination did not improve the learned representation
+  under this architecture.
+- The model also overfits quickly: training accuracy reaches 99.24% by
+  epoch 10 while validation loss has risen substantially from its epoch-3
+  minimum.
+- Therefore the "everything" fusion is not a primary standalone candidate.
+
+Decision:
+- Retire as a standalone classifier.
+- Do not hyperparameter-tune this branch during the broad representation
+  sweep.
+- Retain main137_embeddings.npz and main137_best.pt for possible strict-OOF
+  complementarity testing.
+- Exp13/Main133 remains the stronger learned multi-input representation.
+- Phase 4 can proceed with Experiment 18: BEST MODEL + CROSS-ENTROPY.
+
+
+
+EXPERIMENT 22 RESULT — TF-IDF SUPERVISED AUTOENCODER
+======================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Important implementation note:
+- The original Experiment 21 design attempted direct reconstruction of the
+  60,000-D TF-IDF vector and used 61,829,344 parameters. It was killed by
+  resource exhaustion on the laptop after epoch 1.
+- Experiment 22 therefore uses the memory-safe bottleneck formulation:
+  TF-IDF → SVD(512) → encoder → z(128) → decoder → SVD-space reconstruction,
+  with an additional binary classification head.
+- This tests the supervised-autoencoder hypothesis on the 512-D compressed
+  lexical representation rather than directly reconstructing the original
+  60,000-D sparse TF-IDF matrix.
+
+Configuration:
+- Seed: 142
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- SVD: 512 dimensions
+- SVD explained variance: 26.2017%
+- Encoder: 512 → 256 → 128
+- Decoder: 128 → 256 → 512
+- Classifier: 128 → 1
+- Latent dimension: 128
+- Trainable parameters: 328,961
+- Objective: MSE reconstruction + 1.0 × BCEWithLogitsLoss
+- Positive-class weight: 0.54105
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Best epoch: 4
+- Runtime: ~19.0 sec
+
+Results:
+- Neural validation accuracy at best-loss checkpoint: 82.4953%
+- Neural validation AUC at best-loss checkpoint: 0.9435
+- SVM on learned z: 82.1632%
+- SVM AUC: 0.9437
+- Logistic Regression on learned z: 82.4478%
+- LR AUC: 0.9437
+- Between-class centroid distance: 2.5980
+- Within-class centroid radius: 0.9744
+- Between/within ratio: 2.6664
+
+Training behavior:
+- Epoch 1: train acc 73.42%, val acc 81.50%, AUC 0.9053.
+- Epoch 2: train acc 85.12%, val acc 81.83%, AUC 0.9191.
+- Epoch 3: train acc 88.76%, val acc 80.08%, AUC 0.9378.
+- Epoch 4: train acc 93.59%, val acc 82.50%, AUC 0.9435; best validation
+  total loss.
+- Epoch 5: train acc 96.73%, val acc 83.16%, AUC 0.9461, but validation
+  total loss increased, so it was not selected.
+- Epochs 6–11: training accuracy reached ~99.7% while validation loss remained
+  substantially worse. Early stopping occurred after epoch 11.
+- The reconstruction term became very small and continued improving, while
+  classification loss dominated the total objective. Thus the decoder did
+  not prevent the classifier from overfitting.
+
+Interpretation:
+- The supervised autoencoder successfully learned a nontrivial latent
+  representation: LR/SVM AUC is about 0.944 and the between/within ratio is
+  2.6664.
+- However, the representation is much weaker than the strongest learned
+  representations. Exp13/Main133 reached LR-on-z 90.7970% with AUC 0.9695,
+  while Exp22 reaches only 82.4478% with AUC 0.9437.
+- The latent geometry is not the problem by itself; the representation has
+  measurable class structure, but substantially less useful information than
+  the strongest multi-input representations.
+- Adding the classification objective to reconstruction did not make this
+  autoencoder a competitive standalone classifier.
+- The best validation AUC appears at epoch 7 (0.9503), and threshold accuracy
+  peaks later at epoch 10 (83.44%), but model selection remains based on the
+  predefined best total validation loss at epoch 4. Do not retune to these
+  later validation peaks during the broad sweep.
+- Compared with Experiment 21, Experiment 22 is computationally viable on the
+  laptop because it reconstructs only the 512-D SVD representation. The
+  original 60,000-D direct-reconstruction architecture should not be rerun
+  locally.
+
+Decision:
+- Retire Exp22 as a standalone classifier.
+- Do not hyperparameter-tune the SVD dimension, reconstruction weight, or
+  classification weight yet.
+- Retain main142_embeddings.npz and main142_best.pt for possible later
+  complementary strict-OOF fusion if needed.
+- Proceed to Experiment 23: TF-IDF + CONTRASTIVE SUPERVISED AUTOENCODER.
+- Exp23 should keep the same memory-safe SVD(512) bottleneck rather than
+  returning to direct 60,000-D dense reconstruction.
+
+
+EXPERIMENT 23 RESULT — TF-IDF + CONTRASTIVE SUPERVISED AUTOENCODER
+===================================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 143
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- SVD: 512 dimensions
+- SVD explained variance: 26.2022%
+- Encoder: 512 → 256 → 128
+- Decoder: 128 → 256 → 512
+- Classifier: 128 → 1
+- Latent dimension: 128
+- Trainable parameters: 328,961
+- Objective: MSE reconstruction + 1.0 × BCEWithLogitsLoss
+  + 0.1 × supervised pairwise contrastive loss
+- Contrastive margin: 0.2
+- Positive-class weight: 0.54105
+- Batch size: 128
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Best epoch: 3
+- Runtime: ~29.6 sec
+
+Results:
+- Neural validation accuracy at best-loss checkpoint: 82.5901%
+- Neural validation AUC at best-loss checkpoint: 0.9411
+- SVM on learned z: 82.9696%
+- SVM AUC: 0.9435
+- Logistic Regression on learned z: 83.3966%
+- LR AUC: 0.9412
+- Between-class centroid distance: 0.9473
+- Within-class centroid radius: 0.3278
+- Between/within ratio: 2.8897
+
+Training behavior:
+- Epoch 1: train acc 76.19%, val acc 81.97%, AUC 0.9087.
+- Epoch 2: train acc 87.06%, val acc 84.91%, AUC 0.9268.
+- Epoch 3: train acc 91.85%, val acc 82.59%, AUC 0.9411;
+  validation total loss reached its minimum and this checkpoint was selected.
+- Epochs 4–6: training accuracy rose from 95.97% to 99.03%, while
+  validation loss increased and validation accuracy deteriorated; AUC
+  continued rising to 0.9496 by epoch 6 despite worse total loss.
+- Epochs 7–10: training accuracy approached 99.75%, while validation
+  accuracy fell to ~78–81% and validation loss remained substantially above
+  the epoch-3 minimum. Early stopping occurred after epoch 10.
+- The model therefore exhibits clear overfitting after the selected epoch.
+
+Comparison and interpretation:
+- Exp23 is only marginally better than Exp22 on LR/SVM accuracy:
+  LR-on-z rises from 82.4478% to 83.3966%, and SVM-on-z from 82.1632%
+  to 82.9696%.
+- However, LR-on-z AUC falls from Exp22's 0.9437 to 0.9412, while neural
+  AUC is 0.9411. Thus the contrastive term does not produce a stronger
+  ranking representation.
+- The between/within ratio increases from Exp22's 2.6664 to 2.8897, but
+  this geometric improvement does not translate into stronger AUC or
+  competitive accuracy. This reinforces the tracker observation that
+  centroid separation alone is not sufficient to establish a better
+  classifier.
+- Exp23 remains far below the strongest learned representation, Exp13/Main133:
+  LR-on-z 83.3966% vs 90.7970%, and LR AUC 0.9412 vs 0.9695.
+- It is also far below the current Main115 local validation reference of
+  93.4535%.
+- The reconstruction loss remains tiny relative to the classification and
+  contrastive terms, so reconstruction is not acting as a strong
+  regularizer against classification overfitting.
+
+Decision:
+- Retire Exp23 as a standalone classifier.
+- Do not tune the contrastive weight or margin during the broad sweep.
+- Retain main143_embeddings.npz and main143_best.pt for possible later
+  complementary strict-OOF fusion.
+- The experiment does not justify revisiting the memory-safe SVD512
+  autoencoder family immediately.
+- Proceed to Experiment 24: TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT
+  VECTOR.
+
+EXPERIMENT 24 RESULT — TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT VECTOR
+==================================================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 144
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Canonical stratified split: random_state=42, order preserved
+- Word TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Word SVD: 256 dimensions, explained variance 0.174277
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams,
+  min_df=2, max_df=0.995, max_features=60,000, sublinear TF
+- Transition SVD: 256 dimensions, explained variance 0.145211
+- Structural input: 62-D compact structural/statistical features
+- Architecture:
+  word 256→128→96
+  transition 256→128→96
+  structural 62→96→64
+  fusion 256→192→128
+  shared latent z=128
+  three reconstruction decoders + binary classifier
+- Objective: reconstruction MSE + BCEWithLogitsLoss
+  + 0.1 × supervised pairwise contrastive loss, margin 0.2
+- Reconstruction weights: word=1, transition=1, structural=1
+- Trainable parameters: 294,463
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Batch size: 128
+- Maximum epochs: 40
+- Patience: 7
+- Runtime: ~7.26 s
+
+Results:
+- Best validation-loss epoch: 13
+- Best validation total loss: 0.5890
+- Neural validation accuracy: 86.7173%
+- Neural validation AUC: 0.9592
+- SVM on z: 85.1518%, AUC 0.9587
+- Logistic Regression on z: 86.1006%, AUC 0.9588
+- Between-class centroid distance: 1.3791
+- Within-class centroid distance: 0.4310
+- Between/within ratio: 3.1995
+
+Training behavior:
+- Epoch 1 already reached 86.48% validation accuracy and AUC 0.9410.
+- Training accuracy increased rapidly: 74.50% → 91.49% → 98.03% by epoch 8.
+- By epoch 13 training accuracy reached 99.45%, while the selected validation
+  checkpoint had 86.72% accuracy and AUC 0.9592.
+- Validation metrics fluctuated substantially after the early epochs. Epoch 9,
+  for example, fell to 81.55% accuracy despite continuing low training loss.
+- Epoch 17 reached 87.29% validation accuracy, higher than the selected
+  epoch-13 accuracy, while epoch 8 reached the highest recorded AUC of 0.9609.
+  These are descriptive observations only; the official experiment result
+  remains the checkpoint selected by minimum validation total loss to avoid
+  changing the selection rule after seeing the full history.
+- The reconstruction losses became very small, especially for word and
+  transition inputs, while classification/contrastive terms dominated the
+  total objective. This suggests the autoencoder reconstruction task is not
+  providing a strong regularizing effect against classification overfitting.
+
+Interpretation:
+- Exp24 successfully demonstrates that a shared latent vector can combine
+  word TF-IDF, transition TF-IDF, and structural information in a compact
+  128-D representation.
+- The learned representation contains strong class-ranking information:
+  neural AUC 0.9592 and LR-on-z AUC 0.9588. This is substantially better than
+  the weak standalone accuracy might suggest.
+- However, the representation does not beat the strongest earlier learned
+  branches. Exp13/Main133 has neural accuracy 89.6110%, LR-on-z accuracy
+  90.7970%, and LR-on-z AUC 0.9695. Exp19 also has higher neural accuracy
+  (88.7097%) and similar AUC (0.9600).
+- The between/within ratio of 3.1995 is notably high, exceeding Exp17's 2.9189
+  and Exp23's 2.8897. This again confirms that larger centroid separation does
+  not automatically produce a better classification boundary.
+- SVM/LR do not recover the performance: both are below the neural classifier.
+  Thus the latent geometry is useful, but the particular linear decision
+  boundary is not superior to the trained classifier.
+- The experiment is therefore interesting as a complementary representation,
+  not as a standalone replacement for the classical pipeline.
+- Important reproducibility caveat: the 62-D structural feature extractor used
+  in Main144 was reconstructed to satisfy the intended 62-D interface and was
+  not verified to be byte-for-byte identical to the canonical Main64 structural
+  feature implementation. Therefore, complementarity claims involving Main64
+  should be validated under strict OOF testing rather than inferred from this
+  validation run alone.
+
+Decision:
+- Retire Exp24 as a standalone classifier.
+- Do not spend time tuning the shared autoencoder broadly during the sweep.
+- Retain main144_embeddings.npz and main144_best.pt for possible strict-OOF
+  complementarity testing.
+- Exp24 is worth keeping as a candidate representation because of its strong
+  AUC and high between/within ratio, but it does not justify replacing the
+  current classical reference on its own.
+- Proceed to Experiment 25: TOKENS + TF-IDF + TRANSITION + STRUCTURAL →
+  SHARED LATENT VECTOR.
+
+CURRENT BEST LOCAL VALIDATION REFERENCE
+=======================================
+Main115
+Validation accuracy: 93.4535%
+
+Current best submittable Kaggle model:
+Main79 — 95.00% public Kaggle score
+
+Strongest learned representation so far:
+Main133 — LR-on-z AUC 0.9695; neural AUC 0.9578; standalone validation accuracy 89.6110%.
+Main131 remains stronger on standalone neural accuracy (89.8482%), while Main133
+has the strongest LR-on-z accuracy so far (90.7970%) and strongest LR-on-z AUC.
+Main134 is weaker: neural 83.9658%, LR-on-z 87.7609%, LR-on-z AUC 0.9529%.
+
+EXPERIMENT 25 RESULT — TOKENS + TF-IDF + TRANSITION + STRUCTURAL → SHARED LATENT VECTOR
+==============================================================================================
+
+Status: [✓] Completed / [-] Retired standalone
+
+Configuration:
+- Seed: 145
+- Dataset: 10,536
+- Train/validation: 8,428 / 2,108
+- Canonical stratified split: random_state=42, order preserved
+- Raw token branch:
+  token vocabulary 13,858
+  max sequence length 384
+  embedding 96-D
+  BiGRU hidden size 96-D per direction
+- Word TF-IDF: 1–3 grams, min_df=2, max_df=0.995,
+  max_features=60,000, sublinear TF
+- Word SVD: 256 dimensions, explained variance 0.174277
+- Transition TF-IDF: adjacent-token transitions, 1–2 grams,
+  max_features=60,000
+- Transition SVD: 256 dimensions, explained variance 0.145211
+- Structural input: 62-D compact structural/statistical features
+- Architecture:
+  token branch → 96-D
+  word branch 256→128→96
+  transition branch 256→128→96
+  structural branch 62→96→64
+  fusion 256→192→128
+  shared latent z=128
+  three reconstruction decoders + binary classifier
+- Objective:
+  reconstruction MSE
+  + BCEWithLogitsLoss
+  + 0.1 × supervised pairwise contrastive loss, margin 0.2
+- Reconstruction weights: word=1, transition=1, structural=1
+- Trainable parameters: 1,864,031
+- Learning rate: 0.002
+- Weight decay: 0.0001
+- Batch size: 32
+- Maximum epochs: 40
+- Patience: 7
+- Runtime: ~50.78 s
+
+Results:
+- Best validation-loss epoch: 6
+- Best validation total loss: 0.563412
+- Neural validation accuracy: 89.0892%
+- Neural validation AUC: 0.9510
+- SVM on z: 88.5674%, AUC 0.9503
+- Logistic Regression on z: 88.4250%, AUC 0.9516
+- Between-class centroid distance: 0.8901
+- Within-class centroid distance: 0.3530
+- Between/within ratio: 2.5216
+
+Training behavior:
+- Epoch 1: train accuracy 82.70%, validation accuracy 82.26%, AUC 0.9462.
+- Epoch 3: train accuracy 92.48%, validation accuracy 87.52%, AUC 0.9572.
+- Epoch 4: train accuracy 95.34%, validation accuracy 87.48%, AUC 0.9516.
+- Epoch 6 was selected by minimum validation total loss. Train accuracy had
+  already reached 97.64%, while validation accuracy was 89.09% and AUC 0.9510.
+- After the selected epoch, training accuracy continued toward ~99%, while
+  validation total loss and classification behavior became unstable.
+- Epoch 11 reached 88.09% validation accuracy, but its validation total loss
+  was higher than epoch 6, so epoch 6 remains the official checkpoint under
+  the predefined best-total-validation-loss selection rule.
+- Epoch 12 showed a large validation-loss spike to 1.2776.
+- Early stopping occurred after epoch 13.
+- The model therefore shows clear classification overfitting despite the
+  reconstruction objective.
+
+Comparison and interpretation:
+- Adding the raw-token branch to the Exp24 shared autoencoder substantially
+  improves standalone neural accuracy: 89.0892% vs Exp24's 86.7173%.
+- Exp25 also improves neural accuracy over Exp17 (87.5237%) and Exp19
+  (88.7097%), showing that the raw-token branch can contribute useful
+  information when combined with the three classical representations.
+- However, Exp25 does not establish a stronger latent representation than the
+  best earlier learned branches. Exp13/Main133 reached 89.6110% neural
+  accuracy, 90.7970% LR-on-z accuracy, and 0.9695 LR-on-z AUC. Main131 reached
+  89.8482% standalone neural accuracy.
+- Exp25's neural AUC of 0.9510 and LR-on-z AUC of 0.9516 are also below the
+  strongest earlier learned representations, so the higher 89.09% accuracy
+  does not translate into stronger class-ranking quality.
+- The between/within ratio of 2.5216 is lower than Exp24's 3.1995 and Exp17's
+  2.9189. Thus adding the raw-token branch improves classification accuracy
+  without improving this centroid-separation measure.
+- SVM/LR on the learned z remain below the neural classifier, indicating that
+  the latent representation contains useful nonlinear decision information
+  that a simple linear boundary does not fully recover.
+- Reconstruction losses for word and transition inputs are very small
+  relative to the structural/classification/contrastive terms. As in Exp24,
+  reconstruction is therefore not acting as a strong regularizer against
+  classification overfitting.
+- The experiment demonstrates that the "everything" shared-latent architecture
+  is viable and materially stronger than the no-token Exp24 architecture, but
+  it is still below the strongest learned representations and far below the
+  Main115 local validation reference of 93.4535%.
+
+Decision:
+- Retire Exp25 as a standalone classifier.
+- Do not spend time broadly tuning the architecture during the sweep.
+- Retain main145_embeddings.npz and main145_best.pt for possible later
+  complementary strict-OOF fusion.
+- Exp25 is worth retaining as a candidate representation because its neural
+  validation accuracy reaches 89.0892%, but its AUC and linear-probe results
+  do not indicate that it supersedes Exp13/Main133 or Main131.
+- Proceed to Experiment 26: LEARNED VECTOR + MAIN64 FEATURES.
+
+Next experiment to run:
+Experiment 26 — LEARNED VECTOR + MAIN64 FEATURES
+(Main146: combine the learned representation from Main145 with leakage-safe
+Main64 teacher/classical information, using the canonical split and the
+appropriate train-only OOF teacher artifact.)
+
+

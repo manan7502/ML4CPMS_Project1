@@ -1,0 +1,149 @@
+{
+  "experiment": "Main133 / Phase3 Exp13",
+  "description": "Raw tokens + word TF-IDF + structural features fused into a learned 128-D latent representation",
+  "seed": 133,
+  "dataset_size": 10536,
+  "train_size": 8428,
+  "val_size": 2108,
+  "class_counts": [
+    3699,
+    6837
+  ],
+  "split": {
+    "method": "train_test_split",
+    "test_size": 0.2,
+    "stratify": true,
+    "random_state": 42,
+    "order_preserved": true
+  },
+  "representations": {
+    "raw_tokens": {
+      "maxlen": 384,
+      "embedding": 96,
+      "gru_hidden": 96,
+      "bidirectional": true,
+      "projection": 128
+    },
+    "word_tfidf": {
+      "analyzer": "word",
+      "token_pattern": "(?u)\\\\S+",
+      "ngram_range": [
+        1,
+        3
+      ],
+      "min_df": 2,
+      "max_df": 0.995,
+      "max_features": 60000,
+      "sublinear_tf": true,
+      "svd_dim": 256,
+      "explained_variance": 0.17426905035972595
+    },
+    "structural": {
+      "dimensions": 62,
+      "standard_scaler_fit_on_train": true
+    }
+  },
+  "model": {
+    "token_branch_output": 128,
+    "tfidf_branch_output": 128,
+    "structural_branch_output": 128,
+    "fusion_hidden": 256,
+    "latent_dim": 128,
+    "dropout": 0.2,
+    "fusion_dropout": 0.25,
+    "batch_size": 64,
+    "lr": 0.002,
+    "weight_decay": 0.0001,
+    "max_epochs": 35,
+    "patience": 6,
+    "parameters": 1681057
+  },
+  "best_epoch": 3,
+  "best_val_loss": 0.3536960184574127,
+  "results": {
+    "neural_accuracy": 0.8961100569259962,
+    "neural_auc": 0.9577949660186501,
+    "svm_on_latent_accuracy": 0.8961100569259962,
+    "svm_on_latent_auc": 0.9449996048680258,
+    "lr_on_latent_accuracy": 0.9079696394686907,
+    "lr_on_latent_auc": 0.9695185316895844,
+    "between_centroid_distance": 23.116491317749023,
+    "within_class_mean_radius": 8.720041275024414,
+    "between_within_ratio": 2.6509612269793186
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.4997613514748353,
+      "train_accuracy": 0.8135975320360702,
+      "val_loss": 0.45122894644737244,
+      "val_accuracy": 0.8652751423149905,
+      "val_auc": 0.9495831357673464
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.32278358315369166,
+      "train_accuracy": 0.8973659231134314,
+      "val_loss": 0.40738576650619507,
+      "val_accuracy": 0.8842504743833017,
+      "val_auc": 0.9525900900900902
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.25576911399898566,
+      "train_accuracy": 0.9189606074988135,
+      "val_loss": 0.3536960184574127,
+      "val_accuracy": 0.8961100569259962,
+      "val_auc": 0.9577949660186501
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.17298042505456193,
+      "train_accuracy": 0.9521831988609397,
+      "val_loss": 0.434578001499176,
+      "val_accuracy": 0.8889943074003795,
+      "val_auc": 0.951967757230915
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.12098456554974094,
+      "train_accuracy": 0.9641670621737067,
+      "val_loss": 0.48025014996528625,
+      "val_accuracy": 0.8904174573055028,
+      "val_auc": 0.9564045953848584
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.08567988024392453,
+      "train_accuracy": 0.97781205505458,
+      "val_loss": 0.74498051404953,
+      "val_accuracy": 0.861954459203036,
+      "val_auc": 0.9460881934566145
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.06844743775795238,
+      "train_accuracy": 0.983626008542952,
+      "val_loss": 0.6195518374443054,
+      "val_accuracy": 0.8690702087286527,
+      "val_auc": 0.948316737790422
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.047894637681646375,
+      "train_accuracy": 0.9863550071191267,
+      "val_loss": 0.5084112882614136,
+      "val_accuracy": 0.8818785578747628,
+      "val_auc": 0.9537601746483325
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.039562494872826565,
+      "train_accuracy": 0.9900332225913622,
+      "val_loss": 0.8923322558403015,
+      "val_accuracy": 0.8676470588235294,
+      "val_auc": 0.9407845345345346
+    }
+  ],
+  "runtime_seconds": 87.26275491714478
+}
