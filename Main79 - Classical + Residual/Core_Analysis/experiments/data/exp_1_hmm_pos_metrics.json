@@ -1,0 +1,16 @@
+{
+  "experiment": 1,
+  "name": "Exp 1: HMM Unsupervised POS Induction",
+  "stage4_baseline_acc": 91.30603329103585,
+  "experiment_acc": 91.26807362104631,
+  "experiment_std": 0.6042116730077591,
+  "delta_vs_stage4": -0.03795966998953304,
+  "fold_accuracies": [
+    90.84440227703985,
+    91.69435215946844,
+    90.55529188419554,
+    92.21642145230186,
+    91.0299003322259
+  ],
+  "conclusion": "Unsupervised HMM soft states failed to add linear margin beyond Stage 4 (-0.038%) due to linear subsumption by cumulative N-grams."
+}

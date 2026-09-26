@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Misclassification Analysis & Error Debugging | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4</a></li>
+      <li><a href="stage_5_spectral_trajectory.html">Stage 5 (91.74%)</a></li>
+      <li><a href="misclassification_analysis.html" class="active">Misclassification Analysis (94.06% SOTA)</a></li>
+      <li><a href="bagging_experiments.html">Bagging (91.89%)</a></li>
+      <li><a href="boosting_experiments.html">Boosting (92.22%)</a></li>
+      <li><a href="neural_residual_stacking.html">Neural Stacking</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+        <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+        <li><a href="stage_5_spectral_trajectory.html"><span>Stage 5: Spectral Trajectory</span> <span class="nav-delta">+0.44%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Diagnostic Audit & Peak SOTA</div>
+      <ul class="sidebar-nav">
+        <li><a href="misclassification_analysis.html" class="active"><span>Misclassification Analysis</span> <span class="nav-delta">94.06% PEAK</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Ensemble & Modeling Extensions</div>
+      <ul class="sidebar-nav">
+        <li><a href="bagging_experiments.html"><span>Bagging & Asymmetry</span> <span class="nav-delta">91.89%</span></a></li>
+        <li><a href="boosting_experiments.html"><span>Boosting & Hybrid Stacking</span> <span class="nav-delta">92.22%</span></a></li>
+        <li><a href="neural_residual_stacking.html"><span>Neural Residual Stacking</span> <span class="nav-delta">92.49%</span></a></li>
+        <li><a href="syntactic_and_pos_experiments.html"><span>Syntactic & POS Suite</span> <span class="nav-delta">91.74%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Misclassification_analysis/README.md"><span>Notebooks: Misclassification Suite</span></a></li>
+        <li><a href="../Experiment_II/Out_of_Fold_Residual_Stacking_Neural_MLP_Heads.ipynb"><span>Notebook: Neural Residual Stacking</span></a></li>
+        <li><a href="../Boosting_Ensemble_Methods_Analysis.ipynb"><span>Notebook: Boosting & Hybrid Stacking</span></a></li>
+        <li><a href="../Bagging_LinearSVC_Ensemble_Analysis.ipynb"><span>Notebook: Bagging & Asymmetry</span></a></li>
+        <li><a href="../Stage_5_Spectral_Syntactic_Trajectory_Dynamics.ipynb"><span>Notebook: Stage 5</span></a></li>
+        <li><a href="../Feature_Engineering_Consolidation/feature_extractor.py"><span>Production Feature Extractor</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="stage-tag">Diagnostic Audit & Performance Optimization</div>
+      <h1>Misclassification Analysis & Systematic Error Elimination</h1>
+      <p class="lead">
+        A forensic audit of all <strong>10,536 out-of-fold (OOF) predictions</strong> from the Stage 5 Linear baseline revealed three distinct failure modes. Through four targeted fixes, we eliminated <strong>228 errors</strong>, advancing the program benchmark from <strong>91.89% to 94.06% 5-fold CV accuracy</strong> (Macro F1: 93.54%).
+      </p>
+
+      <!-- Executive Metric Highlights -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-value">91.89%</div>
+          <div class="metric-label">Stage 5 Baseline Accuracy</div>
+          <div class="metric-sub">854 Errors (333 FP | 521 FN)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" style="color: var(--primary);">93.65%</div>
+          <div class="metric-label">Fix 3: LightGBM Stacker</div>
+          <div class="metric-sub">-185 Errors Eliminated</div>
+        </div>
+        <div class="metric-card" style="border: 2px solid var(--success);">
+          <div class="metric-value" style="color: var(--success);">94.06%</div>
+          <div class="metric-label">Fix 4: Neural Residual Stacker</div>
+          <div class="metric-sub">+2.17% Gain | -228 Errors Eliminated</div>
+        </div>
+      </div>
+
+      <!-- Misclassification Branch Architecture Diagram -->
+      <h2>Misclassification Debugging & Stacking Pipeline Architecture</h2>
+      <p>
+        The diagram below illustrates the multi-stage error resolution pipeline—branching from the Stage 5 baseline into feature-level stabilization (Fixes 1 & 2) and non-linear Level-2 stacked arbitration (Fixes 3 & 4):
+      </p>
+
+      <div style="margin: 1.5rem 0 2rem 0; overflow-x: auto; background: white; padding: 1.25rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 380" width="100%" height="auto" style="display: block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <defs>
+            <filter id="m-card-shadow" x="-5%" y="-5%" width="110%" height="112%" filterUnits="userSpaceOnUse">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.06" />
+            </filter>
+            <marker id="m-arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+            </marker>
+            <marker id="m-arrow-teal" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0d9488" />
+            </marker>
+            <marker id="m-arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#7c3aed" />
+            </marker>
+            <marker id="m-arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#16a34a" />
+            </marker>
+          </defs>
+
+          <!-- Background Canvas -->
+          <rect width="940" height="380" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+
+          <!-- Column Headers -->
+          <g font-size="11" font-weight="700" letter-spacing="0.06em" fill="#64748b" text-anchor="middle">
+            <text x="120" y="26">STAGE 5 BASELINE</text>
+            <text x="360" y="26">FORENSIC ERROR AUDIT</text>
+            <text x="630" y="26">FEATURE STABILIZATION (FIX 1 & 2)</text>
+            <text x="830" y="26">LEVEL-2 STACKERS (FIX 3 & 4)</text>
+          </g>
+
+          <!-- Stage 5 Baseline Card -->
+          <g filter="url(#m-card-shadow)">
+            <rect x="20" y="42" width="200" height="315" rx="8" fill="#f8fafc" stroke="#93c5fd" stroke-width="1.5" />
+            <rect x="20" y="42" width="200" height="32" rx="8" fill="#eff6ff" />
+            <text x="120" y="63" font-size="11.5" font-weight="700" fill="#1d4ed8" text-anchor="middle">Stage 5 Dual Pipeline</text>
+            
+            <text x="32" y="96" font-size="10" font-weight="600" fill="#334155">• 248k 1–5 Gram TF-IDF</text>
+            <text x="32" y="114" font-size="10" font-weight="600" fill="#334155">• 34 Dense Descriptors</text>
+            <text x="32" y="132" font-size="10" fill="#64748b">- Entropy &amp; Diversity</text>
+            <text x="32" y="148" font-size="10" fill="#64748b">- Burstiness Dynamics</text>
+            <text x="32" y="164" font-size="10" fill="#64748b">- 16D Spectral Trajectory</text>
+            
+            <rect x="32" y="185" width="176" height="50" rx="5" fill="#ffffff" stroke="#cbd5e1" />
+            <text x="120" y="205" font-size="10.5" font-weight="700" fill="#1e293b" text-anchor="middle">LinearSVC (Balanced)</text>
+            <text x="120" y="223" font-size="10" font-weight="700" fill="#2563eb" text-anchor="middle">91.89% CV (±0.35%)</text>
+
+            <rect x="32" y="250" width="176" height="42" rx="5" fill="#fef2f2" stroke="#fca5a5" />
+            <text x="120" y="268" font-size="10" font-weight="700" fill="#b91c1c" text-anchor="middle">854 Errors Identified</text>
+            <text x="120" y="283" font-size="9" fill="#991b1b" text-anchor="middle">Triggers Forensic Audit</text>
+          </g>
+
+          <!-- Forensic Audit Card -->
+          <g filter="url(#m-card-shadow)">
+            <rect x="250" y="42" width="220" height="315" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+            <rect x="250" y="42" width="220" height="32" rx="8" fill="#f1f5f9" />
+            <text x="360" y="63" font-size="11.5" font-weight="700" fill="#334155" text-anchor="middle">Diagnostic Audit</text>
+
+            <rect x="262" y="86" width="196" height="66" rx="5" fill="#fffbeb" stroke="#fde68a" />
+            <text x="360" y="104" font-size="10" font-weight="700" fill="#b45309" text-anchor="middle">1. Directional Asymmetry</text>
+            <text x="272" y="122" font-size="9" fill="#78350f">• 521 Machine &rarr; Human (61%)</text>
+            <text x="272" y="137" font-size="9" fill="#78350f">• Caused by balanced penalty</text>
+
+            <rect x="262" y="162" width="196" height="74" rx="5" fill="#fef2f2" stroke="#fca5a5" />
+            <text x="360" y="180" font-size="10" font-weight="700" fill="#b91c1c" text-anchor="middle">2. Length Epistemic Fragility</text>
+            <text x="272" y="198" font-size="9" fill="#991b1b">• Length &le; 61: 12.70% error</text>
+            <text x="272" y="213" font-size="9" fill="#991b1b">• Length &gt; 244: 2.20% error</text>
+            <text x="272" y="228" font-size="9" fill="#991b1b">• Small sample variance noise</text>
+
+            <rect x="262" y="246" width="196" height="54" rx="5" fill="#faf5ff" stroke="#e9d5ff" />
+            <text x="360" y="264" font-size="10" font-weight="700" fill="#6b21a8" text-anchor="middle">3. Pathological Outliers</text>
+            <text x="272" y="281" font-size="9" fill="#581c87">• Doc 8821: Margin +1.930 (len 33)</text>
+            <text x="272" y="294" font-size="9" fill="#581c87">• Isolated indicator cues</text>
+          </g>
+
+          <!-- Fix 1 & Fix 2 Card -->
+          <g filter="url(#m-card-shadow)">
+            <rect x="500" y="42" width="220" height="315" rx="8" fill="#ffffff" stroke="#99f6e4" stroke-width="1.5" />
+            <rect x="500" y="42" width="220" height="32" rx="8" fill="#f0fdfa" />
+            <text x="610" y="63" font-size="11.5" font-weight="700" fill="#0f766e" text-anchor="middle">Feature &amp; Prob Fixes</text>
+
+            <rect x="512" y="86" width="196" height="96" rx="5" fill="#f8fafc" stroke="#cbd5e1" />
+            <text x="610" y="104" font-size="10.5" font-weight="700" fill="#0f766e" text-anchor="middle">Fix 1: Platt Calibration</text>
+            <text x="522" y="122" font-size="9" fill="#475569">• In-fold logistic sigmoid</text>
+            <text x="522" y="137" font-size="9" fill="#475569">• Optimal threshold search &tau;*</text>
+            <text x="522" y="152" font-size="9" fill="#475569">• Rebalances 65/35 prior</text>
+            <text x="610" y="172" font-size="10" font-weight="700" fill="#0d9488" text-anchor="middle">Accuracy: 91.94%</text>
+
+            <rect x="512" y="196" width="196" height="105" rx="5" fill="#f0fdfa" stroke="#a7f3d0" />
+            <text x="610" y="214" font-size="10.5" font-weight="700" fill="#065f46" text-anchor="middle">Fix 2: Variance Gating</text>
+            <text x="522" y="232" font-size="9" fill="#065f46">• Gating: f &middot; tanh(L / 50)</text>
+            <text x="522" y="247" font-size="9" fill="#065f46">• Smoothly decays small-sample noise</text>
+            <text x="522" y="262" font-size="9" fill="#065f46">• Short error drops: 12.7% &rarr; 12.1%</text>
+            <text x="522" y="277" font-size="9" fill="#065f46">• Overall Acc: 92.06%</text>
+            <text x="610" y="293" font-size="9.5" font-weight="700" fill="#047857" text-anchor="middle">837 Errors (-17 eliminated)</text>
+          </g>
+
+          <!-- Fix 3 & Fix 4 Stacker Card -->
+          <g filter="url(#m-card-shadow)">
+            <rect x="740" y="42" width="180" height="315" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="1.5" />
+            <rect x="740" y="42" width="180" height="32" rx="8" fill="#f0fdf4" />
+            <text x="830" y="63" font-size="11.5" font-weight="700" fill="#15803d" text-anchor="middle">Level-2 Stackers</text>
+
+            <rect x="750" y="86" width="160" height="96" rx="5" fill="#f8fafc" stroke="#cbd5e1" />
+            <text x="830" y="104" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="middle">Fix 3: LightGBM</text>
+            <text x="758" y="122" font-size="8.5" fill="#475569">• 67-D Tabular vector</text>
+            <text x="758" y="136" font-size="8.5" fill="#475569">• Non-linear length cuts</text>
+            <text x="830" y="153" font-size="10.5" font-weight="800" fill="#1d4ed8" text-anchor="middle">93.65% CV</text>
+            <text x="830" y="170" font-size="8.5" font-weight="700" fill="#15803d" text-anchor="middle">-185 Errors Eliminated</text>
+
+            <rect x="750" y="196" width="160" height="150" rx="6" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+            <text x="830" y="217" font-size="10" font-weight="800" letter-spacing="0.04em" fill="#34d399" text-anchor="middle">Fix 4: PyTorch ResNet</text>
+            <text x="758" y="236" font-size="8.5" fill="#94a3b8">• 40-D Multi-Modal Meta</text>
+            <text x="758" y="250" font-size="8.5" fill="#94a3b8">• 2x ResBlocks + Skip</text>
+            
+            <text x="830" y="280" font-size="20" font-weight="900" fill="#ffffff" text-anchor="middle">94.06%</text>
+            <text x="830" y="297" font-size="9" font-weight="700" fill="#a7f3d0" text-anchor="middle">±0.31% Peak SOTA</text>
+            <text x="830" y="315" font-size="8.5" fill="#94a3b8" text-anchor="middle">Macro F1: 93.54%</text>
+            <text x="830" y="333" font-size="8.5" font-weight="700" fill="#38bdf8" text-anchor="middle">-228 Errors Eliminated</text>
+          </g>
+
+          <!-- Connecting Arrows -->
+          <!-- Base -> Audit -->
+          <path d="M 220 200 L 244 200" stroke="#2563eb" stroke-width="2" fill="none" marker-end="url(#m-arrow-blue)" />
+
+          <!-- Audit -> Fix 1 & 2 -->
+          <path d="M 470 140 L 494 140" stroke="#0d9488" stroke-width="2" fill="none" marker-end="url(#m-arrow-teal)" />
+
+          <!-- Audit -> Fix 3 & 4 (Stackers) -->
+          <path d="M 470 260 C 485 260, 485 200, 734 200" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#m-arrow-purple)" />
+
+          <!-- Fix 1 & 2 -> Stackers -->
+          <path d="M 720 140 L 734 140" stroke="#16a34a" stroke-width="2" fill="none" marker-end="url(#m-arrow-green)" />
+        </svg>
+      </div>
+
+      <h2>1. The Forensic Audit: Three Structural Failure Modes</h2>
+      <p>
+        In the Stage 5 balanced model, the decision hyperplane achieved an overall accuracy of 91.89%, leaving <strong>854 misclassified documents</strong>. Segmenting these errors across directionality, document geometry, and confidence revealed three fundamental flaws:
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Failure Mode 1: Class-Imbalance Penalty Distortion (521 vs. 333)</div>
+        <p>
+          Over <strong>61.0% of all mistakes</strong> (521 out of 854) were <em>Machine documents misclassified as Human</em> (False Negatives). This was directly induced by <code>class_weight='balanced'</code>, which imposes a <strong>1.85&times; higher penalty</strong> on Human errors (\(w_A = 1.424\) vs. \(w_B = 0.770\)). The optimization shifted the decision boundary excessively into the Machine distribution, incorrectly pushing hundreds of borderline Machine texts across the zero margin.
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Failure Mode 2: Sequence Length Epistemic Fragility</div>
+        <p>
+          Document length stratification exposed an extreme disparity:
+        </p>
+        <ul>
+          <li><strong>Long Documents (\(L \in [244, 994]\)):</strong> Near-flawless <strong>97.80% accuracy</strong> (only 46 errors out of 2,094 documents!).</li>
+          <li><strong>Short Documents (\(L \le 61\)):</strong> Severe <strong>12.70% error rate</strong> (273 errors out of 2,149 documents!).</li>
+        </ul>
+        <p>
+          <em>Root Cause:</em> In a 30-token essay, sparse n-gram overlap is nearly nonexistent, while continuous statistical aggregates (Shannon entropy, radius of gyration, burstiness, tortuosity) suffer extreme small-sample estimation variance, throwing the linear decision score.
+        </p>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Failure Mode 3: Pathological Short-Text Outliers</div>
+        <p>
+          The most confident errors occurred on short texts where a linear sum \(\sum w_i x_i + b\) overreacted to isolated cue tokens:
+        </p>
+        <ul>
+          <li><strong>Doc 8821 (Length 33):</strong> True Human classified as Machine with an extreme margin of <strong>+1.930</strong>.</li>
+          <li><strong>Doc 207 (Length 35):</strong> True Machine classified as Human with an extreme margin of <strong>-1.487</strong>.</li>
+          <li><strong>Doc 9031 (Length 46):</strong> True Machine classified as Human with an extreme margin of <strong>-1.475</strong>.</li>
+        </ul>
+      </div>
+
+      <h2>2. The Four Progressive Fixes</h2>
+
+      <h3>Fix 1: Threshold & Margin Probability Calibration</h3>
+      <p>
+        <strong>Objective:</strong> Mitigate Failure Mode 1 by mapping raw uncalibrated SVM margins to true posterior probabilities using in-fold Platt scaling:
+      </p>
+      <div class="formula-box">
+        $$P(y=1|\mathbf{x}) = \frac{1}{1 + \exp(A \cdot f(\mathbf{x}) + B)}$$
+      </div>
+      <p>
+        Optimizing the decision threshold \(\tau^*\) on training folds re-aligns predictions with the natural ~65/35 class prior. Accuracy rises to <strong>91.94%</strong>, converting raw margins into smooth probability inputs for downstream ensembles.
+        <br>
+        <em>Notebook Reference:</em> <a href="../Misclassification_analysis/01_Fix_Threshold_Calibration.ipynb"><code>01_Fix_Threshold_Calibration.ipynb</code></a>
+      </p>
+
+      <h3>Fix 2: Length-Conditioned & Gating Features</h3>
+      <p>
+        <strong>Objective:</strong> Mitigate Failure Mode 2 by stabilizing statistical features across short sequences. We introduce logarithmic length transformations (\(\log(1+L_d), 1/\sqrt{L_d}\)) and hyperbolic tangent <strong>variance gating</strong>:
+      </p>
+      <div class="formula-box">
+        $$\mathbf{f}_{\text{gated}} = \mathbf{f}_{\text{dense}} \cdot \tanh\left(\frac{L_d}{50}\right)$$
+      </div>
+      <p>
+        For short documents (\(L_d < 30\)), features decay smoothly toward zero, preventing noisy statistical estimators from destabilizing the margin.
+      </p>
+      <ul>
+        <li><strong>Accuracy increases to 92.06%</strong> (Macro F1: 91.39%).</li>
+        <li><strong>Short-document error rate (\(L \le 61\)) drops from 12.70% to 12.10%</strong>.</li>
+        <li>Long-document accuracy is completely preserved (45 errors, 97.85% accuracy).</li>
+      </ul>
+      <p>
+        <em>Notebook Reference:</em> <a href="../Misclassification_analysis/02_Fix_Length_Conditioned_Gating.ipynb"><code>02_Fix_Length_Conditioned_Gating.ipynb</code></a>
+      </p>
+
+      <h3>Fix 3: Non-Linear Gradient Boosted Ensemble (LightGBM)</h3>
+      <p>
+        <strong>Objective:</strong> Overcome linear boundary constraints by training gradient boosted decision trees over a 67-dimensional tabular representation combining Stage 5 Linear margins, 34 dense physical descriptors, 30 TruncatedSVD components, and length scales.
+      </p>
+      <p>
+        Trees naturally formulate conditional hierarchical splits (e.g. <code>IF Length &le; 60 AND Token_0 == 0 THEN ...</code>).
+      </p>
+      <ul>
+        <li><strong>Accuracy leaps to 93.65%</strong> (+1.76% over baseline).</li>
+        <li><strong>185 misclassifications eliminated</strong> (total errors drop from 854 to 669).</li>
+        <li><strong>False negatives plummet from 521 down to 328</strong> (-193 errors!).</li>
+      </ul>
+      <p>
+        <em>Notebook Reference:</em> <a href="../Misclassification_analysis/03_Fix_Nonlinear_Gradient_Boosted_Ensemble.ipynb"><code>03_Fix_Nonlinear_Gradient_Boosted_Ensemble.ipynb</code></a>
+      </p>
+
+      <h3>Fix 4: Deep Neural Residual Stacking Architecture (PyTorch)</h3>
+      <p>
+        <strong>Objective:</strong> Resolve multi-modal representation disagreements and pathological outlier margins using a PyTorch Deep Residual Stacker with LayerNorm, GELU, and <strong>2&times; Residual Blocks with Skip Connections</strong> (\(x + \text{Residual}(x)\)):
+      </p>
+      <div class="formula-box">
+        $$\mathbf{h}_0 = \text{GELU}(\text{LayerNorm}(\mathbf{W}_{\text{in}} \mathbf{x} + \mathbf{b}_{\text{in}}))$$
+        $$\mathbf{h}_1 = \mathbf{h}_0 + \text{ResBlock}_1(\mathbf{h}_0), \quad \mathbf{h}_2 = \mathbf{h}_1 + \text{ResBlock}_2(\mathbf{h}_1)$$
+        $$\hat{y} = \sigma(\mathbf{W}_{\text{out}} \mathbf{h}_2 + b_{\text{out}})$$
+      </div>
+      <p>
+        Fusing continuous linear margins, logistic probability approximations, and 15 SVD latent coordinates allows the network to smoothly arbitrate subtle edge cases:
+      </p>
+      <ul>
+        <li><strong>All-Time SOTA Accuracy: 94.06%</strong> (+2.17% over baseline).</li>
+        <li><strong>Macro F1: 93.54%</strong>.</li>
+        <li><strong>228 errors eliminated</strong> (total errors down to 626).</li>
+        <li>Balanced sensitivity: <strong>93.76% Human Recall</strong> and <strong>94.22% Machine Recall</strong>.</li>
+      </ul>
+      <p>
+        <em>Notebook Reference:</em> <a href="../Misclassification_analysis/04_Fix_Neural_Residual_Stacking.ipynb"><code>04_Fix_Neural_Residual_Stacking.ipynb</code></a>
+      </p>
+
+      <h2>3. Master Comparative Benchmark Matrix</h2>
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Model / Fix Configuration</th>
+              <th>5-Fold Accuracy</th>
+              <th>Macro F1</th>
+              <th>Human Recall</th>
+              <th>Machine Recall</th>
+              <th>False Pos (A&rarr;B)</th>
+              <th>False Neg (B&rarr;A)</th>
+              <th>Total Errors</th>
+              <th>&Delta; vs. Baseline</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Stage 5 Baseline (LinearSVC Balanced)</strong></td>
+              <td>91.89%</td>
+              <td>91.21%</td>
+              <td>91.00%</td>
+              <td>92.38%</td>
+              <td>333</td>
+              <td>521</td>
+              <td>854</td>
+              <td>&mdash;</td>
+            </tr>
+            <tr>
+              <td><strong>Fix 1: Threshold & Platt Calibration</strong></td>
+              <td>91.94%</td>
+              <td>91.25%</td>
+              <td>91.78%</td>
+              <td>92.03%</td>
+              <td>304</td>
+              <td>545</td>
+              <td>849</td>
+              <td><span class="badge badge-green">+0.05%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Fix 2: Length-Conditioned Gating</strong></td>
+              <td>92.06%</td>
+              <td>91.39%</td>
+              <td>91.43%</td>
+              <td>92.39%</td>
+              <td>317</td>
+              <td>520</td>
+              <td>837</td>
+              <td><span class="badge badge-green">+0.17%</span></td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Fix 3: Tuned LightGBM Stacker</strong></td>
+              <td><strong>93.65%</strong></td>
+              <td><strong>93.18%</strong></td>
+              <td>90.78%</td>
+              <td><strong>95.20%</strong></td>
+              <td>341</td>
+              <td><strong>328</strong></td>
+              <td><strong>669</strong></td>
+              <td><span class="badge badge-green"><strong>+1.76% (-185 err)</strong></span></td>
+            </tr>
+            <tr class="stage-highlight" style="background-color: var(--success-bg);">
+              <td><strong>Fix 4: Neural Residual Stacker (PyTorch)</strong></td>
+              <td><strong>94.06%</strong></td>
+              <td><strong>93.54%</strong></td>
+              <td><strong>93.76%</strong></td>
+              <td>94.22%</td>
+              <td><strong>231</strong></td>
+              <td>395</td>
+              <td><strong>626</strong></td>
+              <td><span class="badge badge-green"><strong>+2.17% (-228 err)</strong></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Architectural Insight: The Power of Residual Stacking</div>
+        Fix 4 demonstrates that standalone neural networks trained from scratch struggle on anonymized sparse text (~89.9%), but a <strong>Deep Residual Stacker sitting on top of the Classical Stage 5 Teacher</strong> leverages the best of both worlds: robust linear n-gram memorization combined with non-linear geometric arbitration.
+      </div>
+
+            <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="stage_5_spectral_trajectory.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous Step</span>
+          <span class="nav-btn-title">&larr; Stage 5: Spectral Trajectory (91.74%)</span>
+        </a>
+        <a href="bagging_experiments.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Step</span>
+          <span class="nav-btn-title">Bagging & Asymmetry (91.89%) &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

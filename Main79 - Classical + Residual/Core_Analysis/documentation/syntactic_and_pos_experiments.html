@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Syntactic Induction & POS Experiments | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4</a></li>
+      <li><a href="stage_5_spectral_trajectory.html">Stage 5 (91.74%)</a></li>
+      <li><a href="misclassification_analysis.html">Misclassification Analysis (94.06% SOTA)</a></li>
+      <li><a href="bagging_experiments.html">Bagging (91.89%)</a></li>
+      <li><a href="boosting_experiments.html">Boosting (92.22%)</a></li>
+      <li><a href="neural_residual_stacking.html">Neural Stacking</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+        <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+        <li><a href="stage_5_spectral_trajectory.html"><span>Stage 5: Spectral Trajectory</span> <span class="nav-delta">+0.44%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Diagnostic Audit & Peak SOTA</div>
+      <ul class="sidebar-nav">
+        <li><a href="misclassification_analysis.html"><span>Misclassification Analysis</span> <span class="nav-delta">94.06% PEAK</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Ensemble & Modeling Extensions</div>
+      <ul class="sidebar-nav">
+        <li><a href="bagging_experiments.html"><span>Bagging & Asymmetry</span> <span class="nav-delta">91.89%</span></a></li>
+        <li><a href="boosting_experiments.html"><span>Boosting & Hybrid Stacking</span> <span class="nav-delta">92.22%</span></a></li>
+        <li><a href="neural_residual_stacking.html"><span>Neural Residual Stacking</span> <span class="nav-delta">92.49%</span></a></li>
+        <li><a href="syntactic_and_pos_experiments.html" class="active"><span>Syntactic & POS Suite</span> <span class="nav-delta">91.74%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Misclassification_analysis/README.md"><span>Notebooks: Misclassification Suite</span></a></li>
+        <li><a href="../Experiment_II/Out_of_Fold_Residual_Stacking_Neural_MLP_Heads.ipynb"><span>Notebook: Neural Residual Stacking</span></a></li>
+        <li><a href="../Boosting_Ensemble_Methods_Analysis.ipynb"><span>Notebook: Boosting & Hybrid Stacking</span></a></li>
+        <li><a href="../Bagging_LinearSVC_Ensemble_Analysis.ipynb"><span>Notebook: Bagging & Asymmetry</span></a></li>
+        <li><a href="../Stage_5_Spectral_Syntactic_Trajectory_Dynamics.ipynb"><span>Notebook: Stage 5</span></a></li>
+        <li><a href="../Feature_Engineering_Consolidation/feature_extractor.py"><span>Production Feature Extractor</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Syntactic & POS Experiments</span>
+      </div>
+
+      <h1>Part-of-Speech & Syntactic Dynamics: The 4-Way Empirical Investigation</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        A systematic evaluation of latent HMM POS induction versus class-conditional generative models, grammar skeletons, and spectral syntactic trajectory dynamics beyond the Stage 4 baseline (91.31%).
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">Experimental Leaderboard: Syntactic Extensions Beyond Stage 4</div>
+          <span class="badge badge-green">New SOTA: 91.74% (+0.437% Gain)</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          All experiments were evaluated across identical 5-fold stratified cross-validation splits on the full \(N = 10,536\) document corpus, assessing exactly how much new predictive information is added beyond Stage 4.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Stage 4 Baseline</div>
+          <div class="metric-value">91.31%</div>
+          <div class="metric-sub">±0.40% (All-inclusive Stage 4)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Exp 1: HMM Base POS</div>
+          <div class="metric-value" style="color: #dc2626;">91.27%</div>
+          <div class="metric-sub">-0.038% (Linear Subsumption)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Exp 2: Dual HMM Ratio</div>
+          <div class="metric-value" style="color: #2563eb;">91.44%</div>
+          <div class="metric-sub">+0.133% (Std down to ±0.30%)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Exp 4: Spectral Trajectory</div>
+          <div class="metric-value" style="color: #16a34a;">91.74%</div>
+          <div class="metric-sub">+0.437% (New Overall Peak!)</div>
+        </div>
+      </div>
+
+      <h2>Comparative Performance Leaderboard</h2>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Experiment</th>
+              <th>Notebook File</th>
+              <th>Syntactic Modeling Approach</th>
+              <th>5-Fold CV Accuracy</th>
+              <th>Std Dev</th>
+              <th>Δ vs. Stage 4</th>
+              <th>Outcome & Verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Stage 4 Ref</strong></td>
+              <td><a href="../Stage_4_Burstiness_Sequential_Dynamics.ipynb">Stage_4_Burstiness_Sequential_Dynamics.ipynb</a></td>
+              <td>TF-IDF + Length + Diversity + Profiling + Log-DF + Burstiness</td>
+              <td><strong>91.31%</strong></td>
+              <td>±0.40%</td>
+              <td>—</td>
+              <td>Reference Benchmark</td>
+            </tr>
+            <tr>
+              <td><strong>Exp 1</strong></td>
+              <td><a href="../experiments/Exp_1_HMM_Unsupervised_POS_Tagging.ipynb">Exp_1_HMM_Unsupervised_POS_Tagging.ipynb</a></td>
+              <td>Unsupervised Categorical HMM (10 latent POS states + Entropy)</td>
+              <td>91.27%</td>
+              <td>±0.60%</td>
+              <td><span class="badge badge-orange">-0.038%</span></td>
+              <td>Soft unsupervised clusters absorbed by N-grams</td>
+            </tr>
+            <tr>
+              <td><strong>Exp 2</strong></td>
+              <td><a href="../experiments/Exp_2_Dual_Class_Conditional_HMM_Likelihood_Ratio.ipynb">Exp_2_Dual_Class_Conditional_HMM_Likelihood_Ratio.ipynb</a></td>
+              <td>Dual Generative HMMs & Bayesian Syntactic Log-Likelihood Ratio</td>
+              <td><strong>91.44%</strong></td>
+              <td>±0.30%</td>
+              <td><span class="badge badge-green">+0.133%</span></td>
+              <td>True generative syntax separation; variance reduced</td>
+            </tr>
+            <tr>
+              <td><strong>Exp 3</strong></td>
+              <td><a href="../experiments/Exp_3_Grammar_Skeleton_Ngram_Projection.ipynb">Exp_3_Grammar_Skeleton_Ngram_Projection.ipynb</a></td>
+              <td>Closed-class Functional Grammar Skeleton N-Gram Projection</td>
+              <td>90.85%</td>
+              <td>±0.42%</td>
+              <td><span class="badge badge-danger" style="background:#fee2e2; color:#991b1b;">-0.456%</span></td>
+              <td>Content wildcard masking produced severe combinatorial noise</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Exp 4</strong></td>
+              <td><a href="../experiments/Exp_4_Spectral_Syntactic_Trajectory_Dynamics.ipynb">Exp_4_Spectral_Syntactic_Trajectory_Dynamics.ipynb</a></td>
+              <td>Spectral Syntactic Manifold Velocity, Dispersion & Tortuosity</td>
+              <td><strong>91.74%</strong></td>
+              <td>±0.35%</td>
+              <td><span class="badge badge-green" style="background:#dcfce7; color:#15803d; font-weight:800;">+0.437%</span></td>
+              <td><strong>Decisive Winner: Continuous physical trajectory dynamics</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Scientific Findings Across the 4 Experiments</h2>
+
+      <h3>1. Why the Base Unsupervised HMM (Exp 1) Saturated (-0.038%)</h3>
+      <p>
+        In Experiment 1, a 10-state <code>CategoricalHMM</code> was fit to induce latent POS categories. While the latent states displayed intuitive linguistic tendencies, its document-level unigram tag frequencies failed to improve the linear margin.
+      </p>
+      <p>
+        <strong>Reason (Linear Subsumption)</strong>: In a Linear SVM with 248,349 cumulative 1-to-5 grams, common grammatical transitions (e.g. <code>[the, word]</code>, <code>[in, which]</code>) are already explicit coordinates with independent weights. An unsupervised HMM's static tag proportions are essentially a low-rank linear projection of token bigrams; the linear classifier has already learned the optimal weights directly from the sparse \(N\)-gram space.
+      </p>
+
+      <h3>2. Why Dual Class-Conditional HMMs (Exp 2) Succeeded (+0.133%)</h3>
+      <p>
+        In Experiment 2, we separated the corpus and trained two independent generative HMMs: \(\lambda_A\) on Human text and \(\lambda_B\) on Machine text.
+      </p>
+      <p>
+        For each document, we computed the normalized forward log-likelihoods \(\mathcal{L}_A(d)\) and \(\mathcal{L}_B(d)\), yielding the <strong>Bayesian Syntactic Likelihood Ratio</strong>:
+      </p>
+      <div class="formula-box">
+        $$\Delta \mathcal{L}_{\text{syntax}}(d) = \mathcal{L}_B(d) - \mathcal{L}_A(d)$$
+      </div>
+      <p>
+        This directly evaluates which grammar model generated the observed transition flow. Human essays strongly favored \(\lambda_A\) (\(\text{Mean } \Delta \mathcal{L} = -0.1261\)), while Machine essays favored \(\lambda_B\) (\(\text{Mean } \Delta \mathcal{L} = +0.0429\)). This cleanly separated difficult boundary cases, boosting accuracy to <strong>91.44%</strong> and tightening standard deviation to \(\pm 0.30\%\).
+      </p>
+
+      <h3>3. Why the Grammar Skeleton (Exp 3) Failed (-0.456%)</h3>
+      <p>
+        In Experiment 3, we isolated the top 150 functional tokens and replaced all open-class content tokens with a generic token <code>C</code>.
+      </p>
+      <div class="callout callout-danger">
+        <div class="callout-title">The Combinatorial Noise Trap</div>
+        Collapsing thousands of distinct content words into a single dummy token <code>C</code> created hyper-frequent, low-information sequences such as <code>C C C C</code> and <code>C 42 C C</code>. Adding 15,000 sparse skeleton features diluted the primary lexical signal and shifted the SVM hyperplane away from discriminative boundaries.
+      </div>
+
+      <h3>4. The Breakthrough: Spectral Syntactic Trajectory Dynamics (Exp 4, +0.437%)</h3>
+      <p>
+        In Experiment 4, we bypassed iterative Baum-Welch training by applying <strong>Truncated SVD</strong> directly to the row-normalized bigram transition probability matrix \(P(w_{t+1} \mid w_t)\). This extracted a continuous 12-dimensional <strong>Syntactic Manifold</strong> \(\mathbf{e}_w \in \mathbb{R}^{12}\).
+      </p>
+      <p>
+        As an author writes, their essay traces a continuous trajectory \(\mathbf{e}_1, \dots, \mathbf{e}_n\) through this 12-dimensional syntactic space. We modeled the physical dynamics of this trajectory:
+      </p>
+      <ul>
+        <li><strong>Syntactic Velocity Steps</strong>: \(\mathbf{v}_t = \mathbf{e}_{t+1} - \mathbf{e}_t\)</li>
+        <li><strong>Velocity Step Variance</strong>: \(\sigma(\|\mathbf{v}_t\|)\)</li>
+        <li><strong>Syntactic Tortuosity</strong>: Ratio of net displacement to total path length \(\frac{\|\mathbf{e}_n - \mathbf{e}_1\|}{\sum \|\mathbf{v}_t\|}\)</li>
+        <li><strong>Manifold Radius of Gyration</strong>: \(\frac{1}{n} \sum \|\mathbf{e}_t - \boldsymbol{\mu}_e\|^2\)</li>
+      </ul>
+      <p>
+        Because human cognition shifts smoothly between syntactic frames whereas autoregressive decoders hop according to softmax transition probabilities, these continuous physical trajectory metrics achieved a <strong>+0.437% gain</strong>, establishing a new state-of-the-art of <strong>91.74%</strong>!
+      </p>
+
+            <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="neural_residual_stacking.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous Step</span>
+          <span class="nav-btn-title">&larr; Neural Residual Stacking (92.49%)</span>
+        </a>
+        <a href="numerical_scaling_and_engineering.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Step</span>
+          <span class="nav-btn-title">Numerical Scaling & Solvers &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

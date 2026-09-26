@@ -1,0 +1,16 @@
+{
+  "experiment": 3,
+  "name": "Exp 3: Grammar Skeleton N-Gram Projection",
+  "stage4_baseline_acc": 91.30603329103585,
+  "experiment_acc": 90.85045421019122,
+  "experiment_std": 0.4209022503008686,
+  "delta_vs_stage4": -0.45557908084462895,
+  "fold_accuracies": [
+    90.46489563567363,
+    90.46037019458947,
+    90.60275272899858,
+    91.36212624584718,
+    91.36212624584718
+  ],
+  "conclusion": "Grammar skeleton n-grams degraded performance (-0.456%) due to combinatorial noise from content-token masking."
+}

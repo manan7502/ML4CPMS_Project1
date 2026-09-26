@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Systematic Feature Selection & Engineering Progression | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4</a></li>
+      <li><a href="stage_5_spectral_trajectory.html">Stage 5 (91.74%)</a></li>
+      <li><a href="misclassification_analysis.html">Misclassification Analysis (94.06% SOTA)</a></li>
+      <li><a href="bagging_experiments.html">Bagging (91.89%)</a></li>
+      <li><a href="boosting_experiments.html">Boosting (92.22%)</a></li>
+      <li><a href="neural_residual_stacking.html">Neural Stacking</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+        <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+        <li><a href="stage_5_spectral_trajectory.html"><span>Stage 5: Spectral Trajectory</span> <span class="nav-delta">+0.44%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Diagnostic Audit & Peak SOTA</div>
+      <ul class="sidebar-nav">
+        <li><a href="misclassification_analysis.html"><span>Misclassification Analysis</span> <span class="nav-delta">94.06% PEAK</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Ensemble & Modeling Extensions</div>
+      <ul class="sidebar-nav">
+        <li><a href="bagging_experiments.html"><span>Bagging & Asymmetry</span> <span class="nav-delta">91.89%</span></a></li>
+        <li><a href="boosting_experiments.html"><span>Boosting & Hybrid Stacking</span> <span class="nav-delta">92.22%</span></a></li>
+        <li><a href="neural_residual_stacking.html"><span>Neural Residual Stacking</span> <span class="nav-delta">92.49%</span></a></li>
+        <li><a href="syntactic_and_pos_experiments.html"><span>Syntactic & POS Suite</span> <span class="nav-delta">91.74%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Misclassification_analysis/README.md"><span>Notebooks: Misclassification Suite</span></a></li>
+        <li><a href="../Experiment_II/Out_of_Fold_Residual_Stacking_Neural_MLP_Heads.ipynb"><span>Notebook: Neural Residual Stacking</span></a></li>
+        <li><a href="../Boosting_Ensemble_Methods_Analysis.ipynb"><span>Notebook: Boosting & Hybrid Stacking</span></a></li>
+        <li><a href="../Bagging_LinearSVC_Ensemble_Analysis.ipynb"><span>Notebook: Bagging & Asymmetry</span></a></li>
+        <li><a href="../Stage_5_Spectral_Syntactic_Trajectory_Dynamics.ipynb"><span>Notebook: Stage 5</span></a></li>
+        <li><a href="../Feature_Engineering_Consolidation/feature_extractor.py"><span>Production Feature Extractor</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Executive Overview</span>
+      </div>
+
+      <h1>Systematic Feature Engineering & Selection Progression</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        A chronologically ordered, empirical investigation into transforming classical Bag-of-Words text classification into high-precision authorship attribution between Large Language Models and Human Writers.
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">Chronological Accuracy Evolution: Baseline to Peak Performance</div>
+          <span class="badge badge-green">All-Time Peak SOTA: 92.49% (+3.26% Absolute Gain)</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          Every feature family was developed based on explicit linguistic, information-theoretic, and statistical physics hypotheses, then systematically validated on the full \(N = 10,536\) document corpus under strict 5-fold stratified cross-validation.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Majority Baseline</div>
+          <div class="metric-value" style="color: #64748b;">64.89%</div>
+          <div class="metric-sub">Zero-intelligence trivial classifier</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">TF-IDF 1-5 Baseline</div>
+          <div class="metric-value" style="color: #2563eb;">89.23%</div>
+          <div class="metric-sub">±0.75% (Sparse N-gram + Length)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">All-Time Peak SOTA</div>
+          <div class="metric-value" style="color: #16a34a;">92.49%</div>
+          <div class="metric-sub">±0.34% (Neural Residual Stacker)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Cumulative Delta</div>
+          <div class="metric-value" style="color: #0f766e;">+3.26%</div>
+          <div class="metric-sub">From 89.23% to 92.49%</div>
+        </div>
+      </div>
+
+      <!-- End-to-End Pipeline Visual Architecture -->
+      <h2>End-to-End System Architecture: Classical Feature Pipeline & Residual Stacking</h2>
+      <p>
+        The visual below illustrates the complete, leak-free machine learning architecture developed in this program—from raw token sequences through dual sparse-dense feature extraction, cost-sensitive Level-1 base models, and a PyTorch Deep Residual Stacker with disagreement arbitration reaching the <strong>92.49% project record</strong>:
+      </p>
+
+      <div style="margin: 1.75rem 0 2.25rem 0; overflow-x: auto; background: white; padding: 1.25rem; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 560" width="100%" height="auto" style="display: block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <defs>
+            <filter id="card-shadow" x="-5%" y="-5%" width="110%" height="112%" filterUnits="userSpaceOnUse">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.06" />
+            </filter>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#2563eb" />
+            </marker>
+            <marker id="arrow-teal" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0d9488" />
+            </marker>
+            <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#7c3aed" />
+            </marker>
+            <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#16a34a" />
+            </marker>
+          </defs>
+
+          <!-- Background Canvas -->
+          <rect width="940" height="560" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+
+          <!-- Column Headers -->
+          <g font-size="11" font-weight="700" letter-spacing="0.06em" fill="#64748b" text-anchor="middle">
+            <text x="95" y="28">1. INPUT CORPUS</text>
+            <text x="310" y="28">2. DUAL FEATURE EXTRACTION</text>
+            <text x="560" y="28">3. LEVEL-1 BASE LEARNERS (OOF)</text>
+            <text x="810" y="28">4. LEVEL-2 RESIDUAL STACKER</text>
+          </g>
+
+          <!-- 1. INPUT CORPUS CARD -->
+          <g filter="url(#card-shadow)">
+            <rect x="20" y="42" width="150" height="495" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+            <rect x="20" y="42" width="150" height="36" rx="10" fill="#e2e8f0" />
+            <rect x="20" y="68" width="150" height="10" fill="#e2e8f0" />
+            <text x="95" y="65" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Essay Dataset</text>
+            
+            <text x="32" y="102" font-size="11" font-weight="600" fill="#334155">Corpus Scale:</text>
+            <text x="32" y="119" font-size="11" fill="#64748b">• N = 10,536 texts</text>
+            <text x="32" y="135" font-size="11" fill="#64748b">• Full essays</text>
+            
+            <text x="32" y="168" font-size="11" font-weight="600" fill="#334155">Class Asymmetry:</text>
+            <rect x="32" y="178" width="126" height="22" rx="4" fill="#ede9fe" stroke="#c4b5fd" />
+            <text x="95" y="193" font-size="10" font-weight="700" fill="#5b21b6" text-anchor="middle">64.9% Machine (B)</text>
+            
+            <rect x="32" y="206" width="126" height="22" rx="4" fill="#f0fdf4" stroke="#bbf7d0" />
+            <text x="95" y="221" font-size="10" font-weight="700" fill="#166534" text-anchor="middle">35.1% Human (A)</text>
+            
+            <text x="32" y="255" font-size="11" font-weight="600" fill="#334155">Representation:</text>
+            <text x="32" y="272" font-size="11" fill="#64748b">• BPE integer IDs</text>
+            <text x="32" y="288" font-size="11" fill="#64748b">• |V| = 18,440 tokens</text>
+            <text x="32" y="304" font-size="11" fill="#64748b">• L ∈ [15, 1200] len</text>
+
+            <text x="32" y="338" font-size="11" font-weight="600" fill="#334155">Validation Rigor:</text>
+            <rect x="32" y="348" width="126" height="44" rx="6" fill="#ffffff" stroke="#0f766e" stroke-width="1.2" />
+            <text x="95" y="365" font-size="10" font-weight="700" fill="#0f766e" text-anchor="middle">Strict 5-Fold Stratified</text>
+            <text x="95" y="381" font-size="9" fill="#475569" text-anchor="middle">Zero Out-of-Fold Leak</text>
+
+            <text x="95" y="515" font-size="9" fill="#94a3b8" text-anchor="middle">Unprocessed raw tokens</text>
+          </g>
+
+          <!-- 2A. SPARSE N-GRAM BRANCH -->
+          <g filter="url(#card-shadow)">
+            <rect x="200" y="42" width="220" height="190" rx="10" fill="#ffffff" stroke="#93c5fd" stroke-width="1.5" />
+            <rect x="200" y="42" width="220" height="34" rx="10" fill="#eff6ff" />
+            <rect x="200" y="66" width="220" height="10" fill="#eff6ff" />
+            <text x="310" y="64" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="middle">Branch A: Sparse N-Gram Space</text>
+            
+            <text x="214" y="98" font-size="11" font-weight="600" fill="#1e293b">Cumulative TF-IDF (1–5 Grams)</text>
+            <text x="214" y="116" font-size="11" fill="#475569">• Sublinear TF: 1 + log(tf)</text>
+            <text x="214" y="133" font-size="11" fill="#475569">• Corpus min_df = 3 occurrences</text>
+            <text x="214" y="150" font-size="11" fill="#475569">• Space: ~250,000 dimensions</text>
+            
+            <rect x="214" y="168" width="192" height="24" rx="5" fill="#f1f5f9" stroke="#cbd5e1" />
+            <text x="310" y="184" font-size="10" font-weight="700" fill="#334155" text-anchor="middle">Step 0 Baseline: 89.23% (±0.75%)</text>
+            <text x="310" y="218" font-size="9" fill="#64748b" text-anchor="middle">Captures lexical &amp; phrasing cues</text>
+          </g>
+
+          <!-- 2B. DENSE PHYSICAL DESCRIPTORS -->
+          <g filter="url(#card-shadow)">
+            <rect x="200" y="252" width="220" height="285" rx="10" fill="#ffffff" stroke="#99f6e4" stroke-width="1.5" />
+            <rect x="200" y="252" width="220" height="34" rx="10" fill="#f0fdfa" />
+            <rect x="200" y="276" width="220" height="10" fill="#f0fdfa" />
+            <text x="310" y="274" font-size="12" font-weight="700" fill="#0f766e" text-anchor="middle">Branch B: 34 Physical Descriptors</text>
+            
+            <text x="214" y="305" font-size="10.5" fill="#1e293b"><tspan font-weight="700">Stage 1:</tspan> Lexical Entropy &amp; TTR (4D)</text>
+            <text x="214" y="323" font-size="10.5" fill="#1e293b"><tspan font-weight="700">Stage 2:</tspan> Repetition &amp; Token Profiling (6D)</text>
+            <text x="214" y="341" font-size="10.5" fill="#1e293b"><tspan font-weight="700">Stage 3:</tspan> Bayesian Log-DF Affinity (5D)</text>
+            <text x="214" y="359" font-size="10.5" fill="#1e293b"><tspan font-weight="700">Stage 4:</tspan> Burstiness Dynamics B (2D)</text>
+            <text x="214" y="377" font-size="10.5" fill="#1e293b"><tspan font-weight="700">Stage 5:</tspan> Spectral SVD Trajectory (16D)</text>
+            <text x="214" y="395" font-size="10.5" fill="#1e293b"><tspan font-weight="700">Doc Length:</tspan> ln(Token Count) (1D)</text>
+            
+            <rect x="214" y="412" width="192" height="44" rx="6" fill="#fffbeb" stroke="#fde68a" />
+            <text x="310" y="429" font-size="10" font-weight="700" fill="#b45309" text-anchor="middle">Conditioning: MaxAbsScaler</text>
+            <text x="310" y="445" font-size="9" fill="#78350f" text-anchor="middle">Scales to [-1, 1] for LibLinear solver</text>
+            
+            <rect x="214" y="468" width="192" height="24" rx="5" fill="#f0fdf4" stroke="#bbf7d0" />
+            <text x="310" y="484" font-size="10" font-weight="700" fill="#15803d" text-anchor="middle">Standalone GBDT: 90.18% (0 tokens)</text>
+            <text x="310" y="518" font-size="9" fill="#64748b" text-anchor="middle">Invariance across vocabulary shifts</text>
+          </g>
+
+          <!-- 3A. LEVEL-1 LINEARSVC BALANCED -->
+          <g filter="url(#card-shadow)">
+            <rect x="450" y="42" width="220" height="190" rx="10" fill="#ffffff" stroke="#c7d2fe" stroke-width="1.5" />
+            <rect x="450" y="42" width="220" height="34" rx="10" fill="#eef2ff" />
+            <rect x="450" y="66" width="220" height="10" fill="#eef2ff" />
+            <text x="560" y="64" font-size="12" font-weight="700" fill="#4338ca" text-anchor="middle">Level-1: LinearSVC (Balanced)</text>
+            
+            <text x="464" y="98" font-size="10.5" fill="#1e293b">• Input: Sparse TF-IDF ⊕ 34 Dense</text>
+            <text x="464" y="116" font-size="10.5" fill="#1e293b">• Cost-sensitive: w_c = N / (2 · N_c)</text>
+            <text x="464" y="134" font-size="10.5" fill="#1e293b">• LibLinear Dual Coordinate Descent</text>
+            <text x="464" y="152" font-size="10.5" font-weight="600" fill="#4338ca">• Out-of-Fold Outputs Generated:</text>
+            <text x="474" y="169" font-size="10" fill="#475569">- Margin m_i ∈ ℝ | Calibrated p_i = σ(m_i)</text>
+
+            <rect x="464" y="182" width="192" height="24" rx="5" fill="#eef2ff" stroke="#c7d2fe" />
+            <text x="560" y="198" font-size="10" font-weight="700" fill="#3730a3" text-anchor="middle">5-Fold CV: 91.89% (Recall: 91.0%)</text>
+            <text x="560" y="222" font-size="9" fill="#64748b" text-anchor="middle">High-dimensional linear boundary</text>
+          </g>
+
+          <!-- 3B. LEVEL-1 CATBOOST GBDT -->
+          <g filter="url(#card-shadow)">
+            <rect x="450" y="252" width="220" height="285" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.5" />
+            <rect x="450" y="252" width="220" height="34" rx="10" fill="#fff7ed" />
+            <rect x="450" y="276" width="220" height="10" fill="#fff7ed" />
+            <text x="560" y="274" font-size="12" font-weight="700" fill="#c2410c" text-anchor="middle">Level-1: CatBoost GBDT</text>
+            
+            <text x="464" y="305" font-size="10.5" fill="#1e293b">• Input: 34 Physical Descriptors Only</text>
+            <text x="464" y="323" font-size="10.5" fill="#1e293b">• 300 symmetric trees (depth = 6)</text>
+            <text x="464" y="341" font-size="10.5" fill="#1e293b">• Non-linear threshold interactions</text>
+            <text x="464" y="359" font-size="10.5" font-weight="600" fill="#c2410c">• Out-of-Fold Outputs Generated:</text>
+            <text x="474" y="377" font-size="10" fill="#475569">- Tree Posterior q_i ∈ (0, 1)</text>
+            <text x="474" y="393" font-size="10" fill="#475569">- Unbounded Logit ℓ_i = ln(q / (1-q))</text>
+
+            <rect x="464" y="412" width="192" height="44" rx="6" fill="#f8fafc" stroke="#cbd5e1" />
+            <text x="560" y="429" font-size="10" font-weight="700" fill="#475569" text-anchor="middle">Static Blend: 0.85 P_lin + 0.15 P_cb</text>
+            <text x="560" y="445" font-size="9" fill="#64748b" text-anchor="middle">Reached 92.22% (Fixed, blind voting)</text>
+
+            <rect x="464" y="468" width="192" height="24" rx="5" fill="#fff7ed" stroke="#fed7aa" />
+            <text x="560" y="484" font-size="10" font-weight="700" fill="#9a3412" text-anchor="middle">CatBoost Standalone: 90.18%</text>
+            <text x="560" y="518" font-size="9" fill="#64748b" text-anchor="middle">Non-linear physical decision cuts</text>
+          </g>
+
+          <!-- 4. LEVEL-2 NEURAL RESIDUAL STACKING -->
+          <g filter="url(#card-shadow)">
+            <rect x="700" y="42" width="220" height="495" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.5" />
+            <rect x="700" y="42" width="220" height="34" rx="10" fill="#f0fdf4" />
+            <rect x="700" y="66" width="220" height="10" fill="#f0fdf4" />
+            <text x="810" y="64" font-size="12" font-weight="700" fill="#15803d" text-anchor="middle">Level-2: Neural Residual Stacker</text>
+            
+            <!-- Meta-Vector Box -->
+            <rect x="712" y="88" width="196" height="80" rx="6" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.2" />
+            <text x="810" y="106" font-size="10.5" font-weight="700" fill="#6b21a8" text-anchor="middle">40-D Meta-Feature Space (z_i)</text>
+            <text x="720" y="123" font-size="9.5" fill="#475569">• Base Margins: m_lin, p_lin, q_cb, ℓ_cb</text>
+            <text x="720" y="139" font-size="9.5" font-weight="700" fill="#7c3aed">• Disagreement: |p_lin - q_cb|, p·q</text>
+            <text x="720" y="155" font-size="9.5" fill="#475569">• Physical Context: x_dense (34 metrics)</text>
+
+            <!-- ResNet Head Box -->
+            <rect x="712" y="178" width="196" height="205" rx="6" fill="#f8fafc" stroke="#86efac" stroke-width="1.2" />
+            <text x="810" y="197" font-size="10.5" font-weight="700" fill="#166534" text-anchor="middle">PyTorch Deep ResNet Head</text>
+            
+            <text x="722" y="218" font-size="9.5" fill="#334155">1. In-Fold StandardScaler(z_i)</text>
+            <text x="722" y="234" font-size="9.5" fill="#334155">2. Projection: Linear(40→128) + LN</text>
+            
+            <rect x="720" y="243" width="180" height="44" rx="4" fill="#f0fdf4" stroke="#bbf7d0" />
+            <text x="810" y="260" font-size="9.5" font-weight="700" fill="#15803d" text-anchor="middle">2x Residual Blocks (Skip Conns)</text>
+            <text x="810" y="276" font-size="8.5" fill="#166534" text-anchor="middle">LN → Linear(128) → GELU → Dropout(0.25)</text>
+
+            <text x="722" y="304" font-size="9.5" fill="#334155">3. Head: Linear(128→64) + LN + GELU</text>
+            <text x="722" y="320" font-size="9.5" fill="#334155">4. Classifier: Linear(64→1) → Sigmoid</text>
+            
+            <rect x="720" y="330" width="180" height="42" rx="4" fill="#eff6ff" stroke="#bfdbfe" />
+            <text x="810" y="346" font-size="9" font-weight="700" fill="#1e40af" text-anchor="middle">Adaptive Dispute Arbitration:</text>
+            <text x="810" y="361" font-size="8.5" fill="#1e3a8a" text-anchor="middle">Overrides linear margin on conflict (|p-q| > 0.4)</text>
+
+            <!-- SOTA Result Callout -->
+            <rect x="712" y="395" width="196" height="125" rx="8" fill="#0f172a" stroke="#10b981" stroke-width="2" />
+            <text x="810" y="419" font-size="10.5" font-weight="800" letter-spacing="0.05em" fill="#34d399" text-anchor="middle">🏆 ALL-TIME PROJECT SOTA</text>
+            
+            <text x="810" y="449" font-size="24" font-weight="900" fill="#ffffff" text-anchor="middle">94.0585%</text>
+            <text x="810" y="469" font-size="11" font-weight="700" fill="#a7f3d0" text-anchor="middle">±0.3120% (Misclassification Stacker)</text>
+            
+            <text x="810" y="490" font-size="9.5" fill="#94a3b8" text-anchor="middle">Macro F1: 93.54% | Human Rec: 93.76%</text>
+            <text x="810" y="507" font-size="9" font-weight="700" fill="#38bdf8" text-anchor="middle">+4.83% Cumulative Gain Over Base</text>
+          </g>
+
+          <!-- Connective Arrows & Dataflows -->
+          <!-- Raw -> TF-IDF -->
+          <path d="M 170 110 L 194 110" stroke="#2563eb" stroke-width="2" fill="none" marker-end="url(#arrow-blue)" />
+          <!-- Raw -> Dense -->
+          <path d="M 170 380 L 194 380" stroke="#0d9488" stroke-width="2" fill="none" marker-end="url(#arrow-teal)" />
+
+          <!-- TF-IDF -> LinearSVC -->
+          <path d="M 420 110 L 444 110" stroke="#2563eb" stroke-width="2" fill="none" marker-end="url(#arrow-blue)" />
+
+          <!-- Dense -> CatBoost -->
+          <path d="M 420 380 L 444 380" stroke="#0d9488" stroke-width="2" fill="none" marker-end="url(#arrow-teal)" />
+
+          <!-- Dense -> LinearSVC (horizontal stacking) -->
+          <path d="M 420 320 C 435 320, 435 155, 444 155" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrow-teal)" />
+
+          <!-- LinearSVC -> Meta Vector -->
+          <path d="M 670 125 L 704 125" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#arrow-purple)" />
+
+          <!-- CatBoost -> Meta Vector -->
+          <path d="M 670 380 C 685 380, 685 145, 704 145" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#arrow-purple)" />
+
+          <!-- Meta Vector -> ResNet Head -->
+          <path d="M 810 168 L 810 174" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#arrow-green)" />
+
+          <!-- ResNet Head -> SOTA Callout -->
+          <path d="M 810 383 L 810 391" stroke="#16a34a" stroke-width="2.5" fill="none" marker-end="url(#arrow-green)" />
+
+        </svg>
+      </div>
+
+      <!-- Explanatory Breakdown Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; border-top: 3px solid #2563eb;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #2563eb; text-transform: uppercase;">Step 1: Dual Feature Branching</div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.4rem 0 0 0;">
+            Separates lexical token n-grams (~250k sparse dims) from 34 continuous physical invariants (entropy, burstiness, syntax SVD) to prevent dense signals from drowning.
+          </p>
+        </div>
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; border-top: 3px solid #0d9488;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #0d9488; text-transform: uppercase;">Step 2: Numerical Conditioning</div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.4rem 0 0 0;">
+            Applies in-fold <code>MaxAbsScaler</code> to bound dense features into \([-1, 1]\), preventing LibLinear coordinate descent divergence when concatenated with TF-IDF.
+          </p>
+        </div>
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; border-top: 3px solid #6366f1;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #6366f1; text-transform: uppercase;">Step 3: Base Models & Error Audit</div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.4rem 0 0 0;">
+            LinearSVC establishes 91.89% baseline. A forensic error audit diagnosed 521 false negatives and 12.7% short-text error rate.
+          </p>
+        </div>
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; border-top: 3px solid #16a34a;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #16a34a; text-transform: uppercase;">Step 4: Residual Stacking & Fixes</div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.4rem 0 0 0;">
+            Gated features, LightGBM (93.65%), and PyTorch Deep ResNet Stacker eliminate 228 errors, setting the all-time record at <strong>94.0585% SOTA</strong>.
+          </p>
+        </div>
+      </div>
+
+      <h2>Chronological Stage Progression Summary</h2>
+      <p>
+        The table below records the exact 5-fold cross-validation performance, standard deviations, and incremental accuracy improvements across each chronologically added feature block:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Stage / Extension</th>
+              <th>Feature Block / Architecture</th>
+              <th>Dimensions</th>
+              <th>5-Fold CV Accuracy</th>
+              <th>Std Dev</th>
+              <th>Δ vs. Baseline</th>
+              <th>Δ vs. Prev Stage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Baseline</strong></td>
+              <td><a href="baseline.html">Cumulative TF-IDF (1–5) + Document Length</a></td>
+              <td>1 dense + 250k sparse</td>
+              <td><strong>89.23%</strong></td>
+              <td>±0.75%</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><strong>Stage 1</strong></td>
+              <td><a href="stage_1_lexical_diversity.html">Lexical Diversity & Shannon Entropy</a></td>
+              <td>4 dense</td>
+              <td><strong>89.69%</strong></td>
+              <td>±0.46%</td>
+              <td><span class="badge badge-green">+0.47%</span></td>
+              <td><span class="badge badge-green">+0.47%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Stage 2</strong></td>
+              <td><a href="stage_2_ngram_repetition.html">N-Gram Repetition & Token ID Profiling</a></td>
+              <td>6 dense</td>
+              <td><strong>90.31%</strong></td>
+              <td>±0.44%</td>
+              <td><span class="badge badge-green">+1.08%</span></td>
+              <td><span class="badge badge-green">+0.62%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Stage 3</strong></td>
+              <td><a href="stage_3_log_df_pooling.html">Document Log-DF Machine Affinity Pooling</a></td>
+              <td>5 dense</td>
+              <td><strong>91.26%</strong></td>
+              <td>±0.55%</td>
+              <td><span class="badge badge-green">+2.03%</span></td>
+              <td><span class="badge badge-green">+0.95%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Stage 4</strong></td>
+              <td><a href="stage_4_burstiness_dynamics.html">Sequential Dynamics & Token Burstiness</a></td>
+              <td>2 dense</td>
+              <td><strong>91.31%</strong></td>
+              <td>±0.40%</td>
+              <td><span class="badge badge-green">+2.08%</span></td>
+              <td><span class="badge badge-green">+0.05%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Stage 5 (Linear SOTA)</strong></td>
+              <td><a href="stage_5_spectral_trajectory.html">Spectral Syntactic Trajectory Dynamics</a></td>
+              <td>16 dense</td>
+              <td><strong>91.74%</strong> (91.94% bal)</td>
+              <td>±0.35%</td>
+              <td><span class="badge badge-green">+2.51%</span></td>
+              <td><span class="badge badge-green">+0.44%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Bagging & Asymmetry</strong></td>
+              <td><a href="bagging_experiments.html">Cost-Sensitive Balanced LinearSVC</a></td>
+              <td>34 dense + sparse</td>
+              <td><strong>91.89%</strong></td>
+              <td>±0.41%</td>
+              <td><span class="badge badge-green">+2.66%</span></td>
+              <td><span class="badge badge-green">+0.15%</span></td>
+            </tr>
+            <tr>
+              <td><strong>Hybrid Boosting</strong></td>
+              <td><a href="boosting_experiments.html">Calibrated Linear + CatBoost Probability Stacking</a></td>
+              <td>Dual Sparse + Dense Trees</td>
+              <td><strong>92.22%</strong></td>
+              <td>±0.41%</td>
+              <td><span class="badge badge-green">+2.99%</span></td>
+              <td><span class="badge badge-green">+0.33%</span></td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Neural Stacking</strong></td>
+              <td><a href="neural_residual_stacking.html">Out-of-Fold Residual Stacking with Neural MLP Heads</a></td>
+              <td>40-dim Meta-Vector (PyTorch ResNet)</td>
+              <td><strong>92.49%</strong></td>
+              <td>±0.34%</td>
+              <td><span class="badge badge-green"><strong>+3.26%</strong></span></td>
+              <td><span class="badge badge-green"><strong>+0.27%</strong></span></td>
+            </tr>
+            <tr class="stage-highlight" style="background-color: var(--success-bg);">
+              <td><strong>Misclassification Stacker (ALL-TIME PEAK)</strong></td>
+              <td><a href="misclassification_analysis.html">Forensic Error Debugging & Residual Stacker</a></td>
+              <td>40-dim Multi-Modal Meta-Vector (PyTorch ResNet)</td>
+              <td><strong>94.06%</strong></td>
+              <td>±0.31%</td>
+              <td><span class="badge badge-green"><strong>+4.83%</strong></span></td>
+              <td><span class="badge badge-green"><strong>+1.57%</strong></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Why Feature Selection & Hybrid Stacking Succeeded</h2>
+      <ul>
+        <li>
+          <strong>Information-Theoretic Constraints (Stage 1)</strong>: Nucleus sampling truncates tail vocabulary, giving machines constrained entropy.
+        </li>
+        <li>
+          <strong>Autoregressive Phrasing Loops (Stage 2)</strong>: Decoders cycle through local bigram/trigram repetition states.
+        </li>
+        <li>
+          <strong>Corpus-Level Bayesian Affinity (Stage 3)</strong>: Pooling unigram machine log-odds ratios yields the single largest classical leap (+0.95%).
+        </li>
+        <li>
+          <strong>Cognitive Burstiness Dynamics (Stage 4)</strong>: Human associative memory retrieval is non-Poisson and bursty; LLM generation is stationary.
+        </li>
+        <li>
+          <strong>Continuous Syntactic Geometry (Stage 5)</strong>: Embedding the bigram syntax transition matrix via SVD models the physical tortuosity and pacing jitter of human essays vs. machine autoregression (+0.44% SOTA).
+        </li>
+        <li>
+          <strong>Resolving Population Asymmetry (Bagging Study)</strong>: Cost-sensitive inverse class weights correct the 65:35 majority bias, surging human recall from 88.65% to 91.00% (+2.35%).
+        </li>
+        <li>
+          <strong>Hybrid Classical + GBDT Stacking (Boosting Study)</strong>: Blending the high-dimensional linear N-gram posterior (\(0.85 P_{\text{Linear}}\)) with non-linear tree boosting on the 34 dense physical features (\(0.15 P_{\text{CatBoost}}\)) achieved 92.22% 5-fold CV accuracy across all 10,536 essays.
+        </li>
+        <li>
+          <strong>Out-of-Fold Residual Stacking with Neural Heads (Neural Stacking SOTA)</strong>: Replacing static linear probability blending with a deep residual neural network (ResNet blocks with LayerNorm, GELU, and Dropout) taking continuous margins, tree logits, and inter-model disagreement alongside physical descriptors pushes performance to an all-time peak of <strong>92.49% 5-fold CV accuracy</strong> (&plusmn;0.34%), eliminating weak-fold collapses and boosting Macro F1 to 91.81%.
+        </li>
+      </ul>
+
+      <div class="callout callout-info">
+        <div class="callout-title">Key Engineering Breakthrough: Numerical Conditioning</div>
+        Concatenating dense statistics with a 250,000-dimensional sparse TF-IDF matrix initially caused LibLinear coordinate descent to diverge when using <code>StandardScaler</code>, and squashed signals when using row-wise \(L_2\) normalization. The resolution was applying <code>MaxAbsScaler</code> inside each fold, scaling dense statistics into \([-1, 1]\) to match TF-IDF coordinate magnitudes. Full details are documented in <a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a>.
+      </div>
+
+      <h2>Documentation Map</h2>
+      <p>Explore each milestone in depth:</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1.5rem;">
+        <a href="baseline.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-blue">Step 0</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">TF-IDF & Length Baseline</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Establishing the 89.23% foundation with cumulative 1-5 grams and document length.</p>
+          </div>
+        </a>
+        <a href="stage_1_lexical_diversity.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-green">Stage 1 (+0.47%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Lexical Diversity & Entropy</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Shannon entropy, Guiraud's root TTR, and hapax legomena profiling.</p>
+          </div>
+        </a>
+        <a href="stage_2_ngram_repetition.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-orange">Stage 2 (+0.62%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">N-Gram Repetition & Token Profiling</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Markovian transition loops, BPE token ID statistics, and tail vocabulary ratios.</p>
+          </div>
+        </a>
+        <a href="stage_3_log_df_pooling.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-purple">Stage 3 (+0.95%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Log-DF Likelihood Pooling</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Document-level Bayesian log-odds pooling vs. pointwise NBSVM failure.</p>
+          </div>
+        </a>
+        <a href="stage_4_burstiness_dynamics.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-teal">Stage 4 (+0.05%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Burstiness & Sequential Dynamics</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Half-document Jaccard similarity and non-Poisson Goh-Barabási burstiness.</p>
+          </div>
+        </a>
+        <a href="stage_5_spectral_trajectory.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-green">Stage 5 (+0.44%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Spectral Syntactic Trajectory Dynamics</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Continuous 12-D syntactic manifold SVD, dispersion, velocity moments, and tortuosity (91.74%).</p>
+          </div>
+        </a>
+        <a href="bagging_experiments.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-teal">Ensemble (91.89%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Bagging & Population Asymmetry</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Cost-sensitive inverse class weights restoring human recall (+2.35%), and Breiman's stability analysis.</p>
+          </div>
+        </a>
+        <a href="boosting_experiments.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-teal">Ensemble (92.22%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Boosting & Hybrid Stacking</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Calibrated probability stacking (0.85 Linear + 0.15 CatBoost) establishing a 92.22% 5-fold CV baseline.</p>
+          </div>
+        </a>
+        <a href="misclassification_analysis.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card" style="border: 2px solid #2563eb;">
+            <span class="badge badge-blue">Forensic Audit & Peak SOTA (94.06%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Misclassification Analysis</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Auditing 854 errors across length and asymmetry; eliminating 228 errors via non-linear stacking (94.06% CV).</p>
+          </div>
+        </a>
+        <a href="neural_residual_stacking.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-green">Neural Stacking (92.49%)</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Neural Residual Stacking</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Out-of-fold deep ResNet MLP head arbitrating margins, disagreement, and 34 physical metrics (92.49% ±0.34%).</p>
+          </div>
+        </a>
+        <a href="numerical_scaling_and_engineering.html" style="text-decoration: none; color: inherit;">
+          <div class="metric-card">
+            <span class="badge badge-blue">Engineering Deep Dive</span>
+            <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Scaling & Numerical Conditioning</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">MaxAbsScaler vs StandardScaler vs L2-norm in high-dimensional LibLinear SVMs.</p>
+          </div>
+        </a>
+      </div>
+
+            <!-- Pagination -->
+      <div class="page-navigation">
+        <div></div>
+        <a href="baseline.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Step</span>
+          <span class="nav-btn-title">Step 0: Baseline (89.23%) &rarr;</span>
+        </a>
+      </div>
+        <a href="baseline.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Step</span>
+          <span class="nav-btn-title">Step 0: TF-IDF & Document Length Baseline &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

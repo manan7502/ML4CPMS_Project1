@@ -1,0 +1,16 @@
+{
+  "experiment": 2,
+  "name": "Exp 2: Dual Class-Conditional HMMs & Bayesian Syntactic Likelihood Ratio",
+  "stage4_baseline_acc": 91.30603329103585,
+  "experiment_acc": 91.4389011418521,
+  "experiment_std": 0.30331749747844283,
+  "delta_vs_stage4": 0.13286785081625396,
+  "fold_accuracies": [
+    91.17647058823529,
+    91.69435215946844,
+    91.0299003322259,
+    91.83673469387756,
+    91.45704793545325
+  ],
+  "conclusion": "Class-conditional generative HMMs successfully captured generative syntactic flow (+0.133% gain, std down to \u00b10.30%)."
+}

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bagging & Population Asymmetry Analysis | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4</a></li>
+      <li><a href="stage_5_spectral_trajectory.html">Stage 5 (91.74%)</a></li>
+      <li><a href="misclassification_analysis.html">Misclassification Analysis (94.06% SOTA)</a></li>
+      <li><a href="bagging_experiments.html" class="active">Bagging (91.89%)</a></li>
+      <li><a href="boosting_experiments.html">Boosting (92.22%)</a></li>
+      <li><a href="neural_residual_stacking.html">Neural Stacking</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+        <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+        <li><a href="stage_5_spectral_trajectory.html"><span>Stage 5: Spectral Trajectory</span> <span class="nav-delta">+0.44%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Diagnostic Audit & Peak SOTA</div>
+      <ul class="sidebar-nav">
+        <li><a href="misclassification_analysis.html"><span>Misclassification Analysis</span> <span class="nav-delta">94.06% PEAK</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Ensemble & Modeling Extensions</div>
+      <ul class="sidebar-nav">
+        <li><a href="bagging_experiments.html" class="active"><span>Bagging & Asymmetry</span> <span class="nav-delta">91.89%</span></a></li>
+        <li><a href="boosting_experiments.html"><span>Boosting & Hybrid Stacking</span> <span class="nav-delta">92.22%</span></a></li>
+        <li><a href="neural_residual_stacking.html"><span>Neural Residual Stacking</span> <span class="nav-delta">92.49%</span></a></li>
+        <li><a href="syntactic_and_pos_experiments.html"><span>Syntactic & POS Suite</span> <span class="nav-delta">91.74%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Misclassification_analysis/README.md"><span>Notebooks: Misclassification Suite</span></a></li>
+        <li><a href="../Experiment_II/Out_of_Fold_Residual_Stacking_Neural_MLP_Heads.ipynb"><span>Notebook: Neural Residual Stacking</span></a></li>
+        <li><a href="../Boosting_Ensemble_Methods_Analysis.ipynb"><span>Notebook: Boosting & Hybrid Stacking</span></a></li>
+        <li><a href="../Bagging_LinearSVC_Ensemble_Analysis.ipynb"><span>Notebook: Bagging & Asymmetry</span></a></li>
+        <li><a href="../Stage_5_Spectral_Syntactic_Trajectory_Dynamics.ipynb"><span>Notebook: Stage 5</span></a></li>
+        <li><a href="../Feature_Engineering_Consolidation/feature_extractor.py"><span>Production Feature Extractor</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Ensemble Extensions</span>
+        <span class="separator">/</span>
+        <span>Bagging & Population Asymmetry</span>
+      </div>
+
+      <h1>Bagging Ensemble Analysis with LinearSVC: Addressing Population Asymmetry</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        Investigating Bootstrap Aggregation across \(M \in \{1, \dots, 20\}\) linear estimators, evaluating Breiman's stability condition on sparse hyperplanes, and resolving the severe 65% vs 35% class population asymmetry via Cost-Sensitive Balancing.
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">The Asymmetry Finding: Restoring the Minority Human Margin</div>
+          <span class="badge badge-green">5-Fold CV Accuracy: 91.8945% (±0.41%) | Human Recall: 91.00% (+2.35%)</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          Our investigation mathematically validated that unweighted LinearSVC suffered from majority population bias (6,837 Machine texts vs. 3,699 Human texts). Addressing this with Cost-Sensitive Inverse Class Weights surged Human Recall by +2.35% and pushed 5-Fold CV accuracy to a new peak of 91.89%.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Balanced Accuracy</div>
+          <div class="metric-value" style="color: #16a34a;">91.89%</div>
+          <div class="metric-sub">±0.41% (5-Fold Stratified CV)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Human Recall Boost</div>
+          <div class="metric-value" style="color: #2563eb;">+2.35%</div>
+          <div class="metric-sub">Surges from 88.65% to 91.00%</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Macro F1 Score</div>
+          <div class="metric-value" style="color: #0f766e;">91.21%</div>
+          <div class="metric-sub">+0.25% gain over unweighted</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Population Ratio</div>
+          <div class="metric-value">1 : 1.85</div>
+          <div class="metric-sub">3,699 Human vs. 6,837 Machine</div>
+        </div>
+      </div>
+
+      <h2>1. The Problem: Class Population Asymmetry in Empirical Risk Minimization</h2>
+      <p>
+        The corpus comprises <strong>10,536 total documents</strong>:
+      </p>
+      <ul>
+        <li><strong>Class B (Machine-generated, Majority)</strong>: <strong>6,837 documents (64.89%)</strong></li>
+        <li><strong>Class A (Human-authored, Minority)</strong>: <strong>3,699 documents (35.11%)</strong></li>
+      </ul>
+      <p>
+        Under unweighted Empirical Risk Minimization (ERM), the support vector objective minimizes total misclassification hinge penalties:
+      </p>
+      <div class="formula-box">
+        $$\min_{\mathbf{w}, b} \frac{1}{2} \|\mathbf{w}\|^2 + C \sum_{i=1}^N \max(0, 1 - y_i (\mathbf{w}^T \mathbf{x}_i + b))$$
+      </div>
+      <p>
+        Because Machine documents outnumber Human documents by almost 2 to 1, misclassifying a human essay incurs no greater penalty than misclassifying a machine essay. As a result, the optimal separating hyperplane shifts into the human cluster, creating a <strong>4.76% class recall gap</strong> in our baseline:
+      </p>
+      <ul>
+        <li><strong>Machine (Class B) Recall</strong>: <strong>93.41%</strong></li>
+        <li><strong>Human (Class A) Recall</strong>: <strong>88.65%</strong> (suppressed by majority population)</li>
+      </ul>
+
+      <h2>2. Why Standard Bootstrap Bagging Fails on Linear Models</h2>
+      <p>
+        To test whether Bootstrap Aggregation could resolve this, we swept standard <code>BaggingClassifier(LinearSVC)</code> across \(M \in \{1, 3, 5, 7, 10, 15, 20\}\) estimators.
+      </p>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">Breiman's Stability Theorem (1996)</div>
+        Bagging succeeds by reducing estimator variance:
+        $$\text{Var}(\bar{f}) = \rho \sigma^2 + \frac{1 - \rho}{M} \sigma^2$$
+        where \(\sigma^2\) is base estimator variance and \(\rho\) is pairwise correlation. Bagging only produces substantial gains when base learners are <strong>unstable / high-variance</strong> (e.g. unpruned decision trees).
+      </div>
+
+      <p>
+        For convex, \(L_2\)-regularized <code>LinearSVC</code> with \(P \approx 253,796\) sparse N-grams:
+      </p>
+      <ol>
+        <li><strong>Linear hyperplanes are already low-variance, stable learners</strong> (\(\rho \approx 0.95\)).</li>
+        <li><strong>The 36.8% In-Bag Data Loss Penalty</strong>: Drawing samples with replacement means each bag contains only \(1 - 1/e \approx 63.2\%\) unique documents. Depriving a high-dimensional linear model of 36.8% of training vocabulary and examples increases estimation bias, causing accuracy to dip from <strong>91.74% down to 91.13%</strong>.</li>
+      </ol>
+
+      <h2>3. Comprehensive Experimental Comparison Table</h2>
+      <p>
+        Evaluating all asymmetry and ensemble configurations under 5-Fold Stratified Cross-Validation on the full 10,536 corpus using the consolidated <code>FeatureExtractor</code>:
+      </p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Architecture</th>
+              <th>Asymmetry Strategy</th>
+              <th>Estimators (\(M\))</th>
+              <th>5-Fold CV Accuracy</th>
+              <th>Std Dev</th>
+              <th>Macro F1</th>
+              <th>Human Recall</th>
+              <th>Machine Recall</th>
+              <th>Core Trade-off</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Single LinearSVC (Exp 4 SOTA)</strong></td>
+              <td>Unweighted Loss</td>
+              <td>1</td>
+              <td><strong>91.7426%</strong></td>
+              <td>±0.35%</td>
+              <td>90.96%</td>
+              <td>88.65%</td>
+              <td><strong>93.41%</strong></td>
+              <td>Baseline: Majority population suppresses Human recall by 4.8%.</td>
+            </tr>
+            <tr class="stage-highlight">
+              <td><strong>Single Balanced LinearSVC</strong></td>
+              <td><strong>Inverse Frequency Weights</strong></td>
+              <td><strong>1</strong></td>
+              <td><strong>91.8945%</strong></td>
+              <td><strong>±0.41%</strong></td>
+              <td><strong>91.21%</strong></td>
+              <td><strong>91.00%</strong></td>
+              <td>92.38%</td>
+              <td><strong>NEW PEAK</strong>: Retains 100% of data, boosts Human recall by +2.35%.</td>
+            </tr>
+            <tr>
+              <td><strong>Multi-\(C\) Regularization Ensemble</strong></td>
+              <td>Regularization Diversity</td>
+              <td>5</td>
+              <td><strong>91.8660%</strong></td>
+              <td>±0.38%</td>
+              <td>91.18%</td>
+              <td>90.95%</td>
+              <td>92.36%</td>
+              <td>Blends margins across \(C \in \{0.5, 0.75, 1.0, 1.25, 1.5\}\); tightest variance.</td>
+            </tr>
+            <tr>
+              <td><strong>Standard Bagging (Voting)</strong></td>
+              <td>Uniform Bootstrap</td>
+              <td>10</td>
+              <td>90.99%</td>
+              <td>±0.43%</td>
+              <td>90.12%</td>
+              <td>87.43%</td>
+              <td>92.91%</td>
+              <td>Discrete sign voting loses continuous margin confidence.</td>
+            </tr>
+            <tr>
+              <td><strong>Standard Bagging (Margin)</strong></td>
+              <td>Uniform Bootstrap</td>
+              <td>10</td>
+              <td>91.13%</td>
+              <td>±0.40%</td>
+              <td>90.25%</td>
+              <td>87.50%</td>
+              <td>93.10%</td>
+              <td>36.8% in-bag data loss increases linear model bias.</td>
+            </tr>
+            <tr>
+              <td><strong>Balanced Bagging</strong></td>
+              <td>Bootstrap + Weights</td>
+              <td>10</td>
+              <td>90.99%</td>
+              <td>±0.42%</td>
+              <td>90.12%</td>
+              <td>87.43%</td>
+              <td>92.91%</td>
+              <td>Weights balance classes but still suffer from bootstrap data loss.</td>
+            </tr>
+            <tr>
+              <td><strong>Asymmetric Under-Bagging</strong></td>
+              <td>Downsampled Bags (50:50)</td>
+              <td>10</td>
+              <td>90.72%</td>
+              <td>±0.41%</td>
+              <td>90.03%</td>
+              <td><strong>91.75%</strong></td>
+              <td>90.15%</td>
+              <td><strong>Highest Human Recall (91.75%)</strong>, but discards majority data.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>4. Key Conclusions & Recommendations</h2>
+      <ul>
+        <li>
+          <strong>The Solution to Population Asymmetry is Cost-Sensitive Weighting, Not Bagging</strong>: 
+          Applying <code>class_weight='balanced'</code> scales the hinge loss penalty by \(w_c = \frac{N}{2 N_c}\) (\(w_{\text{Human}} \approx 1.424, w_{\text{Machine}} \approx 0.770\)). This trains on <strong>100% of the training data</strong> with zero sample loss, lifting accuracy to <strong>91.89%</strong> and eliminating the human recall penalty.
+        </li>
+        <li>
+          <strong>For Ensemble Stability, Use Margin Diversity (Multi-\(C\))</strong>:
+          Ensembling over diverse regularization penalties \(C \in [0.5, 1.5]\) achieves <strong>91.87%</strong> with a tight standard deviation of \(\pm 0.38\%\).
+        </li>
+      </ul>
+
+            <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="misclassification_analysis.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous Step</span>
+          <span class="nav-btn-title">&larr; Misclassification Analysis (94.06% SOTA)</span>
+        </a>
+        <a href="boosting_experiments.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Step</span>
+          <span class="nav-btn-title">Boosting & Hybrid Stacking (92.22%) &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

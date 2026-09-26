@@ -1,0 +1,22 @@
+{
+  "stage": 1,
+  "stage_name": "Stage 1: Lexical Diversity & Shannon Entropy",
+  "features_added": [
+    "Shannon Entropy",
+    "Root TTR",
+    "Hapax Ratio",
+    "Max Rep Ratio"
+  ],
+  "baseline_mean_acc": 89.22741039401508,
+  "stage_mean_acc": 89.69247263796741,
+  "stage_std_acc": 0.46465940801753325,
+  "delta_vs_baseline": 0.46506224395233176,
+  "delta_vs_previous_stage": 0.46506224395233176,
+  "fold_accuracies": [
+    89.80075901328273,
+    88.79924062648315,
+    90.08068343616516,
+    89.7484575225439,
+    90.03322259136213
+  ]
+}

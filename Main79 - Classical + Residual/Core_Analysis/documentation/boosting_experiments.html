@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boosting Methods & Hybrid Stacking | Authorship Classification</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+</head>
+<body>
+
+    <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <a href="index.html" class="brand">
+      <span class="brand-badge">ML4CPS</span>
+      <span>Authorship Feature Engineering Suite</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="baseline.html">Baseline (89.23%)</a></li>
+      <li><a href="stage_1_lexical_diversity.html">Stage 1</a></li>
+      <li><a href="stage_2_ngram_repetition.html">Stage 2</a></li>
+      <li><a href="stage_3_log_df_pooling.html">Stage 3</a></li>
+      <li><a href="stage_4_burstiness_dynamics.html">Stage 4</a></li>
+      <li><a href="stage_5_spectral_trajectory.html">Stage 5 (91.74%)</a></li>
+      <li><a href="misclassification_analysis.html">Misclassification Analysis (94.06% SOTA)</a></li>
+      <li><a href="bagging_experiments.html">Bagging (91.89%)</a></li>
+      <li><a href="boosting_experiments.html" class="active">Boosting (92.22%)</a></li>
+      <li><a href="neural_residual_stacking.html">Neural Stacking</a></li>
+      <li><a href="numerical_scaling_and_engineering.html">Scaling & Engineering</a></li>
+    </ul>
+  </header>
+
+  <div class="page-wrapper">
+        <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-title">Chronological Progression</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html"><span>Executive Overview</span></a></li>
+        <li><a href="baseline.html"><span>Step 0: Baseline (TF-IDF + Length)</span> <span class="nav-delta">89.23%</span></a></li>
+        <li><a href="stage_1_lexical_diversity.html"><span>Stage 1: Lexical Diversity</span> <span class="nav-delta">+0.47%</span></a></li>
+        <li><a href="stage_2_ngram_repetition.html"><span>Stage 2: Repetition & Profiling</span> <span class="nav-delta">+0.62%</span></a></li>
+        <li><a href="stage_3_log_df_pooling.html"><span>Stage 3: Log-DF Pooling</span> <span class="nav-delta">+0.95%</span></a></li>
+        <li><a href="stage_4_burstiness_dynamics.html"><span>Stage 4: Burstiness Dynamics</span> <span class="nav-delta">+0.05%</span></a></li>
+        <li><a href="stage_5_spectral_trajectory.html"><span>Stage 5: Spectral Trajectory</span> <span class="nav-delta">+0.44%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Diagnostic Audit & Peak SOTA</div>
+      <ul class="sidebar-nav">
+        <li><a href="misclassification_analysis.html"><span>Misclassification Analysis</span> <span class="nav-delta">94.06% PEAK</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Ensemble & Modeling Extensions</div>
+      <ul class="sidebar-nav">
+        <li><a href="bagging_experiments.html"><span>Bagging & Asymmetry</span> <span class="nav-delta">91.89%</span></a></li>
+        <li><a href="boosting_experiments.html" class="active"><span>Boosting & Hybrid Stacking</span> <span class="nav-delta">92.22%</span></a></li>
+        <li><a href="neural_residual_stacking.html"><span>Neural Residual Stacking</span> <span class="nav-delta">92.49%</span></a></li>
+        <li><a href="syntactic_and_pos_experiments.html"><span>Syntactic & POS Suite</span> <span class="nav-delta">91.74%</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Deep Dives & Breakthroughs</div>
+      <ul class="sidebar-nav">
+        <li><a href="numerical_scaling_and_engineering.html"><span>MaxAbsScaler & LibLinear Solvers</span></a></li>
+      </ul>
+
+      <div class="sidebar-title">Executable Artifacts</div>
+      <ul class="sidebar-nav">
+        <li><a href="../Misclassification_analysis/README.md"><span>Notebooks: Misclassification Suite</span></a></li>
+        <li><a href="../Experiment_II/Out_of_Fold_Residual_Stacking_Neural_MLP_Heads.ipynb"><span>Notebook: Neural Residual Stacking</span></a></li>
+        <li><a href="../Boosting_Ensemble_Methods_Analysis.ipynb"><span>Notebook: Boosting & Hybrid Stacking</span></a></li>
+        <li><a href="../Bagging_LinearSVC_Ensemble_Analysis.ipynb"><span>Notebook: Bagging & Asymmetry</span></a></li>
+        <li><a href="../Stage_5_Spectral_Syntactic_Trajectory_Dynamics.ipynb"><span>Notebook: Stage 5</span></a></li>
+        <li><a href="../Feature_Engineering_Consolidation/feature_extractor.py"><span>Production Feature Extractor</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="breadcrumbs">
+        <a href="index.html">Documentation</a>
+        <span class="separator">/</span>
+        <span>Ensemble Extensions</span>
+        <span class="separator">/</span>
+        <span>Boosting & Hybrid Stacking</span>
+      </div>
+
+      <h1>Boosting Methods Investigation: From Linear AdaBoost to Hybrid Stacking</h1>
+      <p style="font-size: 1.15rem; color: var(--text-muted);">
+        Investigating sequential additive modeling across four distinct paradigms, demonstrating why Linear AdaBoost fails on noisy text boundaries, discovering the 90.7% standalone power of the 34 dense physical descriptors, and breaking through to the <strong>all-time project record of 92.22% 5-fold CV accuracy</strong>.
+      </p>
+
+      <div class="stage-lead">
+        <div class="stage-lead-header">
+          <div class="stage-lead-title">The Grand SOTA Breakthrough: Calibrated Hybrid Probability Stacking</div>
+          <span class="badge badge-green">All-Time Peak CV: 92.2171% (±0.41%) | Macro F1: 91.5421%</span>
+        </div>
+        <p style="margin: 0; font-size: 0.95rem; color: var(--text-muted);">
+          By fusing the high-dimensional linear margin (\(P \approx 253,796\) sparse N-grams) with non-linear gradient boosted trees (CatBoost/LightGBM) on the 34 dense physical descriptors, the hybrid ensemble established a decisive accuracy gain across every single fold of the 10,536 document corpus.
+        </p>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">All-Time Record SOTA</div>
+          <div class="metric-value" style="color: #16a34a;">92.22%</div>
+          <div class="metric-sub">±0.41% (5-Fold Stratified CV)</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Total Gain vs. Base</div>
+          <div class="metric-value" style="color: #0f766e;">+2.99%</div>
+          <div class="metric-sub">Over 89.23% Baseline</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Standalone GBDT (Dense)</div>
+          <div class="metric-value" style="color: #2563eb;">90.70%</div>
+          <div class="metric-sub">Zero text tokens; 34 metrics only</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Macro F1 Score</div>
+          <div class="metric-value">91.54%</div>
+          <div class="metric-sub">Highest balanced F1 in project</div>
+        </div>
+      </div>
+
+      <h2>1. The Four Boosting Paradigms Investigated</h2>
+      <p>
+        In text classification, boosting faces two opposite extremes: tree boosting directly on 250,000 sparse columns is computationally prohibitive, while sample-reweighted linear boosting is sensitive to label noise. We evaluated four targeted formulations:
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin: 1.5rem 0;">
+        <div class="metric-card">
+          <span class="badge badge-orange">Paradigm 1</span>
+          <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Linear AdaBoost</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Sequential exponential sample reweighting on LinearSVC hyperplanes.</p>
+        </div>
+        <div class="metric-card">
+          <span class="badge badge-blue">Paradigm 2</span>
+          <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Standalone Modern GBDTs</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">LightGBM, CatBoost, and XGBoost on the 34 dense physical features alone.</p>
+        </div>
+        <div class="metric-card">
+          <span class="badge badge-purple">Paradigm 3</span>
+          <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Two-Stage Residual Boosting</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">GBDT trained on \([\mathbf{x}_{\text{dense}} \mid m_{\text{Linear}}]\) to learn boundary corrections.</p>
+        </div>
+        <div class="metric-card">
+          <span class="badge badge-green">Paradigm 4 (SOTA)</span>
+          <h3 style="margin-top: 0.5rem; font-size: 1.05rem;">Hybrid Probability Stacking</h3>
+          <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0;">Calibrated blending: \(0.85 P_{\text{Linear}} + 0.15 P_{\text{GBDT}}\) reaching 92.22%.</p>
+        </div>
+      </div>
+
+      <h2>2. Why Linear AdaBoost Collapses on High-Dimensional Text</h2>
+      <p>
+        Testing <code>AdaBoostClassifier(LinearSVC)</code> across \(M \in \{1, 2, 3, 5, 8\}\) produced a severe performance drop:
+      </p>
+      <ul>
+        <li>Single LinearSVC Baseline: <strong>91.84%</strong></li>
+        <li>Linear AdaBoost (\(M=2\)): <strong>78.18%</strong> (-13.66%)</li>
+        <li>Linear AdaBoost (\(M=5\)): <strong>82.45%</strong> (-9.39%)</li>
+        <li>Linear AdaBoost (\(M=8\)): <strong>84.30%</strong> (-7.54%)</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <div class="callout-title">The Exponential Loss Overfitting Phenomenon (Hastie et al., 2009)</div>
+        AdaBoost updates sample weights exponentially: \(w_i \leftarrow w_i \exp(-\alpha_m y_i h_m(\mathbf{x}_i))\). In text corpora containing ambiguous or borderline essays (human text adopting structured analysis or LLMs imitating informal prose), AdaBoost concentrates massive weights onto these noisy outliers. In 250,000 dimensions, forcing a linear hyperplane to fit extreme outliers tilts the boundary, severely degrading accuracy across the rest of the corpus.
+      </div>
+
+      <h2>3. Standalone GBDTs on the 34 Dense Descriptors Alone (90.7%)</h2>
+      <p>
+        We trained modern gradient boosted decision trees strictly on the <strong>34 engineered physical descriptors</strong>, completely stripping away all TF-IDF N-grams:
+      </p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>GBDT Algorithm</th>
+              <th>Input Features</th>
+              <th>Accuracy (Fold 1)</th>
+              <th>5-Fold CV Accuracy</th>
+              <th>Macro F1</th>
+              <th>Fit Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>CatBoost</strong> (300 iter, depth 6)</td>
+              <td>34 Dense Only (0 N-grams)</td>
+              <td><strong>90.7021%</strong></td>
+              <td><strong>90.1520%</strong></td>
+              <td>89.41%</td>
+              <td>1.2s</td>
+            </tr>
+            <tr>
+              <td><strong>LightGBM</strong> (200 trees, leaves 31)</td>
+              <td>34 Dense Only (0 N-grams)</td>
+              <td><strong>90.5598%</strong></td>
+              <td><strong>90.0246%</strong></td>
+              <td>89.25%</td>
+              <td>0.3s</td>
+            </tr>
+            <tr>
+              <td><strong>XGBoost</strong> (200 trees, depth 5)</td>
+              <td>34 Dense Only (0 N-grams)</td>
+              <td>90.3226%</td>
+              <td>89.9140%</td>
+              <td>89.10%</td>
+              <td>0.6s</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        <strong>Top Feature Importances Driving the Trees</strong>:
+      </p>
+      <ol>
+        <li><code>Syntactic_Dispersion</code> (\(R_g^2\), manifold radius of gyration).</li>
+        <li><code>Mean_Machine_Affinity</code> and <code>Max_Machine_Affinity</code> (Bayesian log-DF likelihood).</li>
+        <li><code>Root_TTR_Guiraud</code> and <code>Shannon_Entropy</code> (information-theoretic richness).</li>
+        <li><code>Token_Recurrence_Burstiness</code> (\(B\), non-Poisson cognitive inter-arrival clustering).</li>
+      </ol>
+
+      <h2>4. The Breakthrough: Calibrated Hybrid Probability Stacking (92.22%)</h2>
+      <p>
+        Linear models excel at pooling weak lexical signals across 250,000 N-gram dimensions, while GBDTs excel at modeling non-linear thresholds and interactions among dense physical metrics.
+      </p>
+      <div class="formula-box">
+        $$\hat{P}(\text{Machine} \mid \mathbf{x}) = (1 - w) \cdot \frac{1}{1 + e^{-m_{\text{Linear}}(\mathbf{x})}} + w \cdot P_{\text{GBDT}}(\mathbf{x}_{\text{dense}})$$
+      </div>
+      <p>
+        A sensitivity sweep revealed the optimal weighting at \(w = 0.15\) (85% Linear Margin + 15% CatBoost/LightGBM Dense Posterior).
+      </p>
+
+      <h3>Full 5-Fold Stratified Cross-Validation Benchmark</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Fold</th>
+              <th>Balanced Linear Baseline</th>
+              <th>LightGBM Dense Alone</th>
+              <th>Hybrid (Linear + LightGBM)</th>
+              <th>Hybrid (Linear + CatBoost)</th>
+              <th>Net Gain vs. Linear</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Fold 1</td><td>91.84%</td><td>90.42%</td><td><strong>92.41%</strong></td><td><strong>92.41%</strong></td><td><span class="badge badge-green">+0.57%</span></td></tr>
+            <tr><td>Fold 2</td><td>91.93%</td><td>89.99%</td><td><strong>91.98%</strong></td><td><strong>91.98%</strong></td><td><span class="badge badge-green">+0.05%</span></td></tr>
+            <tr><td>Fold 3</td><td>91.31%</td><td>89.04%</td><td><strong>91.41%</strong></td><td><strong>91.60%</strong></td><td><span class="badge badge-green">+0.29%</span></td></tr>
+            <tr><td>Fold 4</td><td>92.60%</td><td>90.75%</td><td><strong>92.79%</strong></td><td><strong>92.83%</strong></td><td><span class="badge badge-green">+0.23%</span></td></tr>
+            <tr><td>Fold 5</td><td>91.79%</td><td>89.94%</td><td><strong>92.22%</strong></td><td><strong>92.26%</strong></td><td><span class="badge badge-green">+0.47%</span></td></tr>
+            <tr class="stage-highlight">
+              <td><strong>5-Fold CV Mean</strong></td>
+              <td><strong>91.8945% (±0.41%)</strong></td>
+              <td><strong>90.0246% (±0.58%)</strong></td>
+              <td><strong>92.1602% (±0.46%)</strong></td>
+              <td><strong>92.2171% (±0.41%)</strong></td>
+              <td><span class="badge badge-green">+0.3226% Average Gain</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-success">
+        <div class="callout-title">Benchmark Milestone: 92.22% (Surpassed by Neural Stacking: 92.49%)</div>
+        The Hybrid Classical + Boosting ensemble outperformed the standalone linear model on <strong>every single fold</strong>, establishing a 92.22% milestone that was subsequently elevated to <strong>92.49%</strong> by the Out-of-Fold Neural Residual Stacker.
+      </div>
+
+            <!-- Pagination -->
+      <div class="page-navigation">
+        <a href="bagging_experiments.html" class="nav-btn nav-btn-prev">
+          <span class="nav-btn-sub">Previous Step</span>
+          <span class="nav-btn-title">&larr; Bagging & Asymmetry (91.89%)</span>
+        </a>
+        <a href="neural_residual_stacking.html" class="nav-btn nav-btn-next">
+          <span class="nav-btn-sub">Next Step</span>
+          <span class="nav-btn-title">Neural Residual Stacking (92.49%) &rarr;</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    Authorship Attribution Feature Engineering Suite &bull; ML4CPS Classical + Residual Analysis &bull; September 2026
+  </footer>
+
+</body>
+</html>

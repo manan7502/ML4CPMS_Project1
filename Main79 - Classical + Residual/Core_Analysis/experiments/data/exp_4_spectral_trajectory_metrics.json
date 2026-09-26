@@ -1,0 +1,16 @@
+{
+  "experiment": 4,
+  "name": "Exp 4: Spectral Syntactic Embeddings & Trajectory Dynamics",
+  "stage4_baseline_acc": 91.30603329103585,
+  "experiment_acc": 91.74261902810636,
+  "experiment_std": 0.34562225647862543,
+  "delta_vs_stage4": 0.43658573707051573,
+  "fold_accuracies": [
+    91.50853889943073,
+    91.83673469387756,
+    91.36212624584718,
+    92.35880398671097,
+    91.6468913146654
+  ],
+  "conclusion": "Continuous syntactic trajectory dynamics broke through Stage 4, achieving 91.74% (+0.437% gain) with tight variance (\u00b10.35%)."
+}
