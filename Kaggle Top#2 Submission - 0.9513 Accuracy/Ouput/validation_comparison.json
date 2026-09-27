@@ -1,0 +1,29 @@
+{
+  "locked_main79": {
+    "val_accuracy": 0.9364326375711575,
+    "val_auc": 0.9803698435277381,
+    "public_score": 0.95
+  },
+  "locked_main79_exp11": {
+    "val_accuracy": 0.9388045540796964,
+    "val_auc": 0.9826665481270744,
+    "public_score": 0.9506
+  },
+  "bagged_svc_teacher": {
+    "val_accuracy": 0.9293168880455408,
+    "val_auc": 0.9754820610083769
+  },
+  "main79_svcbag": {
+    "val_accuracy": 0.9369070208728653,
+    "val_auc": 0.9802009246088195
+  },
+  "exp11": {
+    "val_accuracy": 0.9060721062618596,
+    "val_auc": 0.9660166745693062
+  },
+  "main79_svcbag_exp11_blend": {
+    "alpha": 0.86,
+    "accuracy": 0.9411764705882353,
+    "auc": 0.9821370712818082
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "experiment": "Main79 with 3-member bootstrap-bagged LinearSVC replacing the single Main66 SVC",
+  "svc_bag_seeds": [
+    42,
+    123,
+    777
+  ],
+  "svc_C": 10.0,
+  "meta_C": 3.0,
+  "blend_alpha": 0.86,
+  "section7_validation_main79": 0.9369070208728653,
+  "section7_validation_blend": 0.9411764705882353,
+  "section7_validation_blend_auc": 0.9821370712818082,
+  "exp11_best_epoch": 5,
+  "test_counts": {
+    "main79_svcbag_A": 1053,
+    "main79_svcbag_B": 1947,
+    "exp11_A": 1157,
+    "exp11_B": 1843,
+    "blend_A": 1056,
+    "blend_B": 1944
+  },
+  "submission_files": [
+    "submission_main79_svcbag.csv",
+    "submission_exp11_reproduced.csv",
+    "submission_main79_svcbag_exp11_blend.csv"
+  ]
+}
